@@ -1,12 +1,13 @@
 #pragma once
 
 #include "vector3.hpp"
+#include "ray.hpp"
 
-class camera
+class Camera
 {
 public:
 
-    camera(const Vector3& _lookfrom, const Vector3& _lookat, 
+    Camera(const Vector3& _lookfrom, const Vector3& _lookat, 
            const Vector3& _up , float _vfov, float _aspect)
     {
         float theta = _vfov * M_PI / 180.0f;
@@ -24,11 +25,12 @@ public:
         m_horizontal = 2.0f * half_width * m_camera_right;
         m_vertical = 2.0f * half_height * m_camera_up;
     }
-        
-    // inline ray get_ray(float u, float v) const
-    // {
-    //     return ray(origin, lower_left_corner + u * horizontal + v * vertical - origin);
-    // }
+    
+    inline Ray get_ray(float u, float v) const
+    {
+        return Ray(m_origin, 
+            m_lower_left_corner + u * m_horizontal + v * m_vertical - m_origin);
+    }
 
     Vector3 m_lower_left_corner; 
     Vector3 m_horizontal;
