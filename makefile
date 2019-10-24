@@ -2,7 +2,7 @@
 CC := g++
 SRCEXT := cpp
 CFLAGS := -O2 -std=c++17 -pthread -g -Wall
-INCDIR := -I include
+INCDIR := -I include vendor/include
 
 # Source Info, target = cpplox, entry should be in cpplox.cpp
 SRCDIR := src
