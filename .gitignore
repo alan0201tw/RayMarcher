@@ -4,3 +4,8 @@ bin/*
 
 # executables
 main
+*.sh
+
+# output files
+output/*
+*.mp4

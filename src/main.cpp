@@ -1,5 +1,6 @@
 #include <iostream>
-
+#include <sstream>
+#include <iomanip>
 #include <array>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -19,6 +20,9 @@ namespace
     unsigned char image[3 * image_width * image_height];
 
     typedef std::array<float, 3> rgb01;
+
+    // just tmp values
+    float tmp = 0.0f;
 }
 
 inline void write_to_image(size_t u, size_t v, rgb01 value)
@@ -41,7 +45,7 @@ float box(Vector3 pos, Vector3 size)
 float distfunc(Vector3 pos)
 {
     float d0 = box(pos, Vector3(1.0f));
-    float d1 = sphere(pos - Vector3(1.5f), 1.0f);
+    float d1 = sphere(pos - Vector3(1.5f - tmp), 1.0f);
 
     const float k = 3.0f;
     float h = std::max( k - abs(d0 - d1), 0.0f ) / k;
@@ -90,7 +94,7 @@ rgb01 GetColor(float u, float v)
     return {0, 0, 0};
 }
 
-int main(int argc, char* argv[])
+static void Render()
 {
     for(size_t i = 0; i < image_width; i++)
     {
@@ -102,10 +106,34 @@ int main(int argc, char* argv[])
             write_to_image(i, j, color);
         }
     }
+}
 
-    // stbi_flip_vertically_on_write(true);
-    if(stbi_write_png("output.png", image_width, image_height, 3, image, 0) == 0)
+static void Output(std::string fileName)
+{
+    // std::cout << "fileName = " << fileName << std::endl;
+    stbi_flip_vertically_on_write(true);
+    if(stbi_write_png(fileName.c_str(), image_width, image_height, 3, image, 0) == 0)
     {
         std::cerr << "Error when saving image\n";
+    }
+}
+
+int main(int argc, char* argv[])
+{
+    int image_index = 0;
+    std::stringstream ss;
+    tmp = -5;
+    while(tmp <= 5.0f)
+    {
+        ss << "output/output_";
+        ss << image_index;
+        ss << ".png";
+
+        Render();
+        Output(ss.str());
+
+        tmp += 0.1f;
+        image_index++;
+        ss.str(std::string());
     }
 }

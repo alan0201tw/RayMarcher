@@ -26,5 +26,13 @@ clean:
 	@echo "$(RM) -r $(BINDIR) $(TARGET)"; $(RM) -r $(BINDIR) $(TARGET)
 	@echo "$(RM) -r $(TESTBINDIR)"; $(RM) -r $(TESTBINDIR)
 
+video:
+	@echo " Making Video...";
+	@echo "./util/gen_video.sh output"; ./util/gen_video.sh output
+
+play:
+	@echo " Playing Video...";
+	@echo "xdg-open result.mp4"; xdg-open result.mp4
+
 # Declare clean as utility, not a file
 .PHONY: clean exec
