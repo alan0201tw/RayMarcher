@@ -1,7 +1,8 @@
 # Compile Info
-CC := g++
+CC := clang++
 SRCEXT := cpp
-CFLAGS := -O2 -std=c++17 -pthread -g -Wall
+CFLAGS := -O3 -std=gnu++17 -pthread -g -Wall
+# use -isystem on vender headers to suppress warning
 INCDIR := -I include -I vendor/include
 
 # Source Info, target = cpplox, entry should be in cpplox.cpp
@@ -26,6 +27,11 @@ clean:
 	@echo "$(RM) -r $(BINDIR) $(TARGET)"; $(RM) -r $(BINDIR) $(TARGET)
 	@echo "$(RM) -r $(TESTBINDIR)"; $(RM) -r $(TESTBINDIR)
 
+remove_output:
+	@echo " Removing output...";
+	@echo "$(RM) -r output/*"; $(RM) -r output/*
+	@echo "$(RM) -r result.mp4"; $(RM) -r result.mp4
+
 video:
 	@echo " Making Video...";
 	@echo "./util/gen_video.sh output"; ./util/gen_video.sh output
@@ -35,4 +41,4 @@ play:
 	@echo "xdg-open result.mp4"; xdg-open result.mp4
 
 # Declare clean as utility, not a file
-.PHONY: clean exec
+.PHONY: clean exec video play

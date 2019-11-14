@@ -3,18 +3,18 @@
 #include "vector3.hpp"
 #include "ray.hpp"
 
-class Camera
+class Camera final
 {
 public:
 
-    Camera(
+    explicit Camera(
         const Vector3& lookfrom, 
         const Vector3& lookat, 
         const Vector3& up,
         float vfov,
         float aspect)
     {
-        float theta = vfov * M_PI / 180.0f;
+        float theta = static_cast<float>(vfov * M_PI / 180.0f);
         float half_height = std::tan(theta / 2.0f);
         float half_width = aspect * half_height;
 

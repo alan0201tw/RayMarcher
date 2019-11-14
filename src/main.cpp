@@ -8,8 +8,13 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "ThreadPool.h"
+
 #include "vector3.hpp"
 #include "camera.hpp"
+
+#include "entity.hpp"
+#include "meshOperation.hpp"
 
 namespace
 {
@@ -25,32 +30,27 @@ namespace
     float tmp = 0.0f;
 }
 
-inline void write_to_image(size_t u, size_t v, rgb01 value)
+void write_to_image(size_t u, size_t v, rgb01 value)
 {
-    image[v * 3 * image_width + u * 3 + 0] = (unsigned char)255 * value[0];
-    image[v * 3 * image_width + u * 3 + 1] = (unsigned char)255 * value[1];
-    image[v * 3 * image_width + u * 3 + 2] = (unsigned char)255 * value[2];
-}
-
-float sphere(Vector3 pos, float radius)
-{
-	return length(pos) - radius;
-}
-
-float box(Vector3 pos, Vector3 size)
-{
-    return length(max(abs(pos) - size, 0.0));
+    image[v * 3 * image_width + u * 3 + 0] = static_cast<unsigned char>(255 * value[0]);
+    image[v * 3 * image_width + u * 3 + 1] = static_cast<unsigned char>(255 * value[1]);
+    image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255 * value[2]);
 }
 
 float distfunc(Vector3 pos)
 {
-    float d0 = box(pos, Vector3(1.0f));
-    float d1 = sphere(pos - Vector3(1.5f - tmp), 1.0f);
+    static std::shared_ptr<Entity> sphere
+        = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
+    static std::shared_ptr<Entity> cube
+        = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
+    static std::vector<std::shared_ptr<Entity>> entityList
+        = { sphere,cube };
+    static std::shared_ptr<Entity> blendingEntity
+        = std::make_shared<MeshBlender>(entityList);
+    
+    sphere->m_position = Vector3(1.5f - tmp);
 
-    const float k = 3.0f;
-    float h = std::max( k - abs(d0 - d1), 0.0f ) / k;
-
-    return std::min(d0, d1) - h*h*h*k*(1.0f/6.0f);
+    return blendingEntity->Distance(pos);
 }
 
 rgb01 GetColor(float u, float v)
@@ -64,8 +64,8 @@ rgb01 GetColor(float u, float v)
     );
 
     const int MAX_ITER = 100; // 100 is a safe number to use, it won't produce too many artifacts and still be quite fast
-    const float MAX_DIST = 20.0; // Make sure you change this if you have objects farther than 20 units away from the camera
-    const float EPSILON = 0.001; // At this distance we are close enough to the object that we have essentially hit it
+    const float MAX_DIST = 20.0f; // Make sure you change this if you have objects farther than 20 units away from the camera
+    const float EPSILON = 0.001f; // At this distance we are close enough to the object that we have essentially hit it
 
     Ray ray = camera.get_ray(u, v);
 
@@ -75,12 +75,9 @@ rgb01 GetColor(float u, float v)
 
     for (int i = 0; i < MAX_ITER; i++)
     {
-        // std::cout << "pos = " << pos.x << 
-        //     ", " << pos.y <<
-        //     ", " << pos.z << std::endl;
         // Either we've hit the object or hit nothing at all, either way we should break out of the loop
         if (dist < EPSILON || totalDist > MAX_DIST)
-            break; // If you use windows and the shader isn't working properly, change this to continue;
+            break;
 
         dist = distfunc(pos); // Evalulate the distance at the current point
         totalDist += dist;
@@ -96,6 +93,24 @@ rgb01 GetColor(float u, float v)
 
 static void Render()
 {
+    // using thread pool for parallelism
+#if 1
+    ThreadPool pool(image_width);
+
+    for(size_t i = 0; i < image_width; i++)
+    {
+        auto result = pool.enqueue([](size_t i)
+        {
+            for(size_t j = 0; j < image_height; j++)
+            {
+                rgb01 color = GetColor((float)i / (float)image_width, 
+                    (float)j / (float)image_height);
+
+                write_to_image(i, j, color);
+            }
+        }, i);
+    }
+#else // naive implementation
     for(size_t i = 0; i < image_width; i++)
     {
         for(size_t j = 0; j < image_height; j++)
@@ -106,6 +121,7 @@ static void Render()
             write_to_image(i, j, color);
         }
     }
+#endif
 }
 
 static void Output(std::string fileName)
@@ -122,8 +138,8 @@ int main(int argc, char* argv[])
 {
     int image_index = 0;
     std::stringstream ss;
-    tmp = -5;
-    while(tmp <= 5.0f)
+    tmp = -3.0;
+    while(tmp <= 3.0f)
     {
         ss << "output/output_";
         ss << image_index;
@@ -133,6 +149,7 @@ int main(int argc, char* argv[])
         Output(ss.str());
 
         tmp += 0.1f;
+
         image_index++;
         ss.str(std::string());
     }

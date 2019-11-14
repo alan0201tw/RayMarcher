@@ -4,7 +4,6 @@ bin/*
 
 # executables
 main
-*.sh
 
 # output files
 output/*
