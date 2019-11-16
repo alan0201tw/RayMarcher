@@ -1,10 +1,17 @@
 # folders
 .vscode/*
+.vs/*
 bin/*
+bin-int/*
 
 # executables
 main
+*.exe
 
 # output files
 output/*
 *.mp4
+
+# Visual studio solution/project files
+*.sln
+*.vcxproj*
