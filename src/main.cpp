@@ -97,8 +97,10 @@ rgb01 GetColor(float u, float v)
 static void Render()
 {
     // using thread pool for parallelism
+    // for simple scene, thread overhead actually slows down the process
+    // when it becomes more complex, switch to 2D parallel
 #if 1
-    ThreadPool pool(image_width);
+    ThreadPool pool(8);
 
     for(size_t i = 0; i < image_width; i++)
     {
