@@ -10,3 +10,4 @@
 #include "linalg.h"
 
 using Vector3 = linalg::aliases::float3;
+using Matrix3x3 = linalg::aliases::float3x3;

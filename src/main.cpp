@@ -43,17 +43,22 @@ float distfunc(Vector3 pos)
         = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
     static std::shared_ptr<Entity> cube
         = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
-    static std::shared_ptr<Entity> sphere1
-        = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
-    static std::vector<std::shared_ptr<Entity>> entityList
-        = { sphere, cube, sphere1 };
-    static std::shared_ptr<Entity> blendingEntity
-        = std::make_shared<MeshBlender>(entityList);
+    // static std::shared_ptr<Entity> sphere1
+    //     = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
+    // static std::vector<std::shared_ptr<Entity>> entityList
+    //     = { sphere, cube };
+    // static std::shared_ptr<Entity> blendingEntity
+    //     = std::make_shared<MeshBlender>(entityList);
 
     sphere->m_position = Vector3(1.5f - tmp);
-    sphere1->m_position = Vector3(0.0f, 0.0f, tmp);
 
-    return blendingEntity->Distance(pos);
+    Matrix3x3 rotation(
+        {std::cos(tmp), 0, std::sin(tmp)},
+        {0, 1, 0},
+        {-std::sin(tmp), 0, std::cos(tmp)}
+    );
+
+    return cube->Distance( linalg::mul( linalg::inverse(rotation) , pos) );
 }
 
 rgb01 GetColor(float u, float v)
