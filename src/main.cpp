@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iomanip>
 #include <array>
+#include <limits>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -32,6 +33,10 @@ namespace
 
 void write_to_image(size_t u, size_t v, rgb01 value)
 {
+    value[0] = std::sqrt(value[0]);
+    value[1] = std::sqrt(value[1]);
+    value[2] = std::sqrt(value[2]);
+
     image[v * 3 * image_width + u * 3 + 0] = static_cast<unsigned char>(255 * value[0]);
     image[v * 3 * image_width + u * 3 + 1] = static_cast<unsigned char>(255 * value[1]);
     image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255 * value[2]);
@@ -43,12 +48,10 @@ float distfunc(Vector3 pos)
         = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
     static std::shared_ptr<Entity> cube
         = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
-    // static std::shared_ptr<Entity> sphere1
-    //     = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
-    // static std::vector<std::shared_ptr<Entity>> entityList
-    //     = { sphere, cube };
-    // static std::shared_ptr<Entity> blendingEntity
-    //     = std::make_shared<MeshBlender>(entityList);
+    static std::vector<std::shared_ptr<Entity>> entityList
+        = { sphere, cube };
+    static std::shared_ptr<Entity> blendingEntity
+        = std::make_shared<MeshBlender>(entityList);
 
     sphere->m_position = Vector3(1.5f - tmp);
 
@@ -58,7 +61,7 @@ float distfunc(Vector3 pos)
         {-std::sin(tmp), 0, std::cos(tmp)}
     );
 
-    return cube->Distance( linalg::mul( linalg::inverse(rotation) , pos) );
+    return blendingEntity->Distance( linalg::mul( linalg::inverse(rotation) , pos) );
 }
 
 rgb01 GetColor(float u, float v)
@@ -93,7 +96,21 @@ rgb01 GetColor(float u, float v)
     
         if(dist < EPSILON)
         {
-            return {1, 1, 1};
+            Vector3 eps_x = Vector3(EPSILON * 0.1f, 0.0f, 0.0f);
+            Vector3 eps_y = Vector3(0.0f, EPSILON * 0.1f, 0.0f);
+            Vector3 eps_z = Vector3(0.0f, 0.0f, EPSILON * 0.1f);
+            Vector3 normal = linalg::normalize(Vector3(
+                distfunc(pos + eps_x) - distfunc(pos - eps_x),
+                distfunc(pos + eps_y) - distfunc(pos - eps_y),
+                distfunc(pos + eps_z) - distfunc(pos - eps_z)));
+
+            float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
+            float specular = pow(diffuse, 32.0);
+
+            float color = diffuse + specular;
+            color = std::clamp(color, 0.0f, 1.0f);
+
+            return {color, color, color};
         }
     }
     return {0, 0, 0};
