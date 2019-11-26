@@ -11,7 +11,7 @@
 
 #include "ThreadPool.h"
 
-#include "vector3.hpp"
+#include "vec_math.hpp"
 #include "camera.hpp"
 
 #include "entity.hpp"
@@ -46,10 +46,12 @@ float distfunc(Vector3 pos)
 {
     static std::shared_ptr<Entity> sphere
         = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
-    static std::shared_ptr<Entity> cube
-        = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
+    // static std::shared_ptr<Entity> cube
+    //     = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
+    static std::shared_ptr<Entity> prism
+        = std::make_shared<Prism>(Vector3(0.0f), Vector2(0.3f, 3.0f));
     static std::vector<std::shared_ptr<Entity>> entityList
-        = { sphere, cube };
+        = { sphere, prism };
     static std::shared_ptr<Entity> blendingEntity
         = std::make_shared<MeshBlender>(entityList, 3.0f);
 

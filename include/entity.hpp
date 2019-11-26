@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vector3.hpp"
+#include "vec_math.hpp"
 
 class Entity
 {
@@ -17,7 +17,7 @@ public:
 
 class Sphere final : public Entity
 {
-public:
+private:
     float m_radius;
 public:
     explicit Sphere(Vector3 position, float radius)
@@ -29,11 +29,24 @@ public:
 
 class Cube final : public Entity
 {
-public:
+private:
     Vector3 m_extent;
 public:
     explicit Cube(Vector3 position, Vector3 extent)
         : Entity(position), m_extent(extent)
+        {}
+
+    virtual float Distance(Vector3 point) const final override;
+};
+
+class Prism final : public Entity
+{
+private:
+    Vector2 m_h;
+
+public:
+    explicit Prism(Vector3 position, Vector2 _h)
+        : Entity(position), m_h(_h)
         {}
 
     virtual float Distance(Vector3 point) const final override;

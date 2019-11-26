@@ -16,3 +16,10 @@ float Cube::Distance(Vector3 point) const
 
     return ud + n;
 }
+
+float Prism::Distance(Vector3 point) const
+{
+    Vector3 q = abs(point);
+    return std::max(q.z - m_h.y,
+        std::max(q.x * 0.866025f + point.y * 0.5f, -point.y) - m_h.x * 0.5f);
+}

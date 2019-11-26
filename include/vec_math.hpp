@@ -9,5 +9,6 @@
 
 #include "linalg.h"
 
+using Vector2 = linalg::aliases::float2;
 using Vector3 = linalg::aliases::float3;
 using Matrix3x3 = linalg::aliases::float3x3;
