@@ -51,7 +51,7 @@ float distfunc(Vector3 pos)
     static std::vector<std::shared_ptr<Entity>> entityList
         = { sphere, cube };
     static std::shared_ptr<Entity> blendingEntity
-        = std::make_shared<MeshBlender>(entityList);
+        = std::make_shared<MeshBlender>(entityList, 3.0f);
 
     sphere->m_position = Vector3(1.5f - tmp);
 

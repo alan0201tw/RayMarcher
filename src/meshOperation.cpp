@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-float MeshBlender::SmoothDistance(float d0, float d1, const float k) const
+float MeshBlender::SmoothDistance(float d0, float d1, const float k)
 {
     // !!! IMPORTANT !!!
     // use std::abs so g++ do not link to integer version
@@ -20,7 +20,7 @@ float MeshBlender::Distance(Vector3 point) const
     float currentDistance = m_entities[0]->Distance(point);
     for(size_t i = 0; i < m_entities.size(); i++)
     {
-        currentDistance = SmoothDistance(currentDistance, m_entities[i]->Distance(point), 3.0f);
+        currentDistance = SmoothDistance(currentDistance, m_entities[i]->Distance(point), m_k);
     }
     return currentDistance;
 }
