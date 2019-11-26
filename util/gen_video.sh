@@ -2,12 +2,28 @@
 
 [ $# -eq 0 ] && { echo "Usage: $0 output_dir"; exit 1; }
 
+if grep -q Microsoft /proc/version; then
+    # force overwrite
+    ./ffmpeg.exe -y \
+    -r 30 \
+    -i ${1}/output_%d.png \
+    -c:v libx264 -qp 1 -profile:v high444 -preset fast -pix_fmt yuv420p \
+    result.mp4
+else
+    # force overwrite
+    ffmpeg -y \
+    -r 30 \
+    -i ${1}/output_%d.png \
+    -c:v libx264 -qp 1 -profile:v high444 -preset fast -pix_fmt yuv420p \
+    result.mp4
+fi
+
 # force overwrite
-ffmpeg -y \
--r 30 \
--i ${1}/output_%d.png \
--c:v libx264 -qp 1 -profile:v high444 -preset fast -pix_fmt yuv420p \
-result.mp4
+# ffmpeg -y \
+# -r 30 \
+# -i ${1}/output_%d.png \
+# -c:v libx264 -qp 1 -profile:v high444 -preset fast -pix_fmt yuv420p \
+# result.mp4
 
 # xdg-open result.mp4
 

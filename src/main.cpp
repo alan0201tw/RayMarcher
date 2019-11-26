@@ -46,12 +46,12 @@ float distfunc(Vector3 pos)
 {
     static std::shared_ptr<Entity> sphere
         = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
-    // static std::shared_ptr<Entity> cube
-    //     = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
-    static std::shared_ptr<Entity> prism
-        = std::make_shared<Prism>(Vector3(0.0f), Vector2(0.3f, 3.0f));
+     static std::shared_ptr<Entity> cube
+         = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
+    //static std::shared_ptr<Entity> prism
+    //    = std::make_shared<Prism>(Vector3(0.0f), Vector2(0.3f, 3.0f));
     static std::vector<std::shared_ptr<Entity>> entityList
-        = { sphere, prism };
+        = { sphere, cube };
     static std::shared_ptr<Entity> blendingEntity
         = std::make_shared<MeshBlender>(entityList, 3.0f);
 
@@ -107,7 +107,7 @@ rgb01 GetColor(float u, float v)
                 distfunc(pos + eps_z) - distfunc(pos - eps_z)));
 
             float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
-            float specular = pow(diffuse, 32.0);
+            float specular = pow(diffuse, 32.0f);
 
             float color = diffuse + specular;
             color = std::clamp(color, 0.0f, 1.0f);
