@@ -1,19 +1,22 @@
+// cpp standard library
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 #include <array>
 #include <limits>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+// vendor library
+
+// #define STB_IMAGE_IMPLEMENTATION
+// #include "stb_image.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
 #include "ThreadPool.h"
 
+// header files included in project
 #include "vec_math.hpp"
 #include "camera.hpp"
-
 #include "entity.hpp"
 #include "meshOperation.hpp"
 
@@ -27,8 +30,8 @@ namespace
 
     typedef std::array<float, 3> rgb01;
 
-    // just tmp values
-    float tmp = 0.0f;
+    // time parameters to support animation output
+    float current_time = 0.0f;
 }
 
 void write_to_image(size_t u, size_t v, rgb01 value)
@@ -42,28 +45,46 @@ void write_to_image(size_t u, size_t v, rgb01 value)
     image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255 * value[2]);
 }
 
-float distfunc(Vector3 pos)
+DistanceInfo distfunc(Vector3 pos)
 {
-    static std::shared_ptr<Entity> sphere
-        = std::make_shared<Sphere>(Vector3(0.0f), 1.0f);
-     static std::shared_ptr<Entity> cube
-         = std::make_shared<Cube>(Vector3(0.0f), Vector3(1.0f));
-    //static std::shared_ptr<Entity> prism
-    //    = std::make_shared<Prism>(Vector3(0.0f), Vector2(0.3f, 3.0f));
-    static std::vector<std::shared_ptr<Entity>> entityList
-        = { sphere, cube };
-    static std::shared_ptr<Entity> blendingEntity
-        = std::make_shared<MeshBlender>(entityList, 3.0f);
-
-    sphere->m_position = Vector3(1.5f - tmp);
-
     Matrix3x3 rotation(
-        {std::cos(tmp), 0, std::sin(tmp)},
+        {std::cos(current_time * 5.0f), 0, std::sin(current_time * 5.0f)},
         {0, 1, 0},
-        {-std::sin(tmp), 0, std::cos(tmp)}
+        {-std::sin(current_time * 5.0f), 0, std::cos(current_time * 5.0f)}
     );
 
-    return blendingEntity->Distance( linalg::mul( linalg::inverse(rotation) , pos) );
+    Transform sphereTransform = 
+    {
+        Vector3(2.5f),
+        rotation,
+        Vector3(1.0f)
+    };
+
+    Transform cubeTransform = 
+    {
+        Vector3(0.0f),
+        Matrix3x3( {1,0,0}, {0,1,0}, {0,0,1} ),
+        Vector3(1.0f)
+    };
+
+    static std::shared_ptr<IDistance> sphere
+        = std::make_shared<Sphere>(sphereTransform, 1.0f);
+    static std::shared_ptr<IDistance> cube
+         = std::make_shared<Cube>(cubeTransform, Vector3(1.0f));
+    //static std::shared_ptr<Entity> prism
+    //    = std::make_shared<Prism>(Vector3(0.0f), Vector2(0.3f, 3.0f));
+    
+    static std::vector<std::shared_ptr<IDistance>> entityList
+        = { sphere, cube };
+    static std::shared_ptr<IDistance> blendingEntity
+        = std::make_shared<MeshBlender>(entityList, 3.0f);
+
+    auto* tmp = reinterpret_cast<Entity*>(sphere.get());
+    tmp->m_transform.position = Vector3(5.0f * (0.5f - current_time));
+    tmp = reinterpret_cast<Entity*>(cube.get());
+    tmp->m_transform.orientation = rotation;
+
+    return blendingEntity->GetDistanceInfo(pos, current_time);
 }
 
 rgb01 GetColor(float u, float v)
@@ -92,7 +113,8 @@ rgb01 GetColor(float u, float v)
         if (dist < EPSILON || totalDist > MAX_DIST)
             break;
 
-        dist = distfunc(pos); // Evalulate the distance at the current point
+        auto info = distfunc(pos); // Evalulate the distance at the current point
+        dist = info.distance;
         totalDist += dist;
         pos += dist * ray.GetDirection(); // Advance the point forwards in the ray direction by the distance
     
@@ -102,17 +124,18 @@ rgb01 GetColor(float u, float v)
             Vector3 eps_y = Vector3(0.0f, EPSILON * 0.1f, 0.0f);
             Vector3 eps_z = Vector3(0.0f, 0.0f, EPSILON * 0.1f);
             Vector3 normal = linalg::normalize(Vector3(
-                distfunc(pos + eps_x) - distfunc(pos - eps_x),
-                distfunc(pos + eps_y) - distfunc(pos - eps_y),
-                distfunc(pos + eps_z) - distfunc(pos - eps_z)));
+                distfunc(pos + eps_x).distance - distfunc(pos - eps_x).distance,
+                distfunc(pos + eps_y).distance - distfunc(pos - eps_y).distance,
+                distfunc(pos + eps_z).distance - distfunc(pos - eps_z).distance));
 
             float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
             float specular = pow(diffuse, 32.0f);
 
-            float color = diffuse + specular;
-            color = std::clamp(color, 0.0f, 1.0f);
+            float light_intensity = diffuse + specular;
+            Vector3 color = 
+                std::clamp(light_intensity, 0.0f, 1.0f) * info.color;
 
-            return {color, color, color};
+            return color;
         }
     }
     return {0, 0, 0};
@@ -167,8 +190,8 @@ int main(int argc, char* argv[])
 {
     int image_index = 0;
     std::stringstream ss;
-    tmp = -5.0;
-    while(tmp <= 5.0f)
+    current_time = 0.0f;
+    while(current_time <= 1.0f)
     {
         ss << "output/output_";
         ss << image_index;
@@ -177,7 +200,7 @@ int main(int argc, char* argv[])
         Render();
         Output(ss.str());
 
-        tmp += 0.1f;
+        current_time += 0.01f;
 
         image_index++;
         ss.str(std::string());

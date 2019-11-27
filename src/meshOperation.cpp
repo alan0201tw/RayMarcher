@@ -2,25 +2,49 @@
 
 #include <stdexcept>
 
-float MeshBlender::SmoothDistance(float d0, float d1, const float k)
+DistanceInfo MeshBlender::SmoothDistance(
+    DistanceInfo info0, 
+    DistanceInfo info1, 
+    const float k)
 {
+    const float d0 = info0.distance;
+    const float d1 = info1.distance;
+    const Vector3 col0 = info0.color;
+    const Vector3 col1 = info1.color;
+
     // !!! IMPORTANT !!!
     // use std::abs so g++ do not link to integer version
-    float h = std::max( k - std::abs(d0 - d1), 0.0f ) / k;
-    return (std::min(d0, d1) - h*h*h*k*(1.0f/6.0f));
+    const float h = std::max( k - std::abs(d0 - d1), 0.0f ) / k;
+
+    DistanceInfo info;
+    info.distance = (std::min(d0, d1) - h*h*h*k*(1.0f/6.0f));
+    
+    const float dd0 = std::abs(info.distance - d0);
+    const float dd1 = std::abs(info.distance - d1);
+    const float r0 = dd0 / (dd0 + dd1);
+    const float r1 = dd1 / (dd0 + dd1);
+
+    info.color = 
+        col0 * std::abs(r1) + 
+        col1 * std::abs(r0);
+
+    return info;
 }
 
-float MeshBlender::Distance(Vector3 point) const
+DistanceInfo MeshBlender::GetDistanceInfo(Vector3 point, float time) const
 {
     if(m_entities.empty())
     {
         throw std::runtime_error("Empty Blender!");
     }
 
-    float currentDistance = m_entities[0]->Distance(point);
+    DistanceInfo currentInfo = m_entities[0]->GetDistanceInfo(point, time);
     for(size_t i = 0; i < m_entities.size(); i++)
     {
-        currentDistance = SmoothDistance(currentDistance, m_entities[i]->Distance(point), m_k);
+        currentInfo = SmoothDistance(
+            currentInfo,
+            m_entities[i]->GetDistanceInfo(point, time),
+            m_k);
     }
-    return currentDistance;
+    return currentInfo;
 }

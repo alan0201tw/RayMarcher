@@ -1,18 +1,32 @@
 #pragma once
 
-#include "vec_math.hpp"
+#include "transform.hpp"
 
-class Entity
+struct DistanceInfo
+{
+    float distance;
+    Vector3 color;
+};
+
+class IDistance
 {
 public:
-    Vector3 m_position;
+    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const = 0;
+};
 
-    explicit Entity(Vector3 position)
-        : m_position(position)
-        {};
-
+class Entity : public IDistance
+{
 public:
-    virtual float Distance(Vector3 point) const = 0;
+    Transform m_transform;
+
+    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const = 0;
+
+protected:
+    explicit Entity(
+        Transform transform
+        )
+        : m_transform(transform)
+          {};
 };
 
 class Sphere final : public Entity
@@ -20,11 +34,11 @@ class Sphere final : public Entity
 private:
     float m_radius;
 public:
-    explicit Sphere(Vector3 position, float radius)
-        : Entity(position), m_radius(radius)
+    explicit Sphere(Transform transform, float radius)
+        : Entity(transform), m_radius(radius)
         {}
 
-    virtual float Distance(Vector3 point) const final override;
+    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };
 
 class Cube final : public Entity
@@ -32,11 +46,11 @@ class Cube final : public Entity
 private:
     Vector3 m_extent;
 public:
-    explicit Cube(Vector3 position, Vector3 extent)
-        : Entity(position), m_extent(extent)
+    explicit Cube(Transform transform, Vector3 extent)
+        : Entity(transform), m_extent(extent)
         {}
 
-    virtual float Distance(Vector3 point) const final override;
+    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };
 
 class Prism final : public Entity
@@ -45,9 +59,9 @@ private:
     Vector2 m_h;
 
 public:
-    explicit Prism(Vector3 position, Vector2 _h)
-        : Entity(position), m_h(_h)
+    explicit Prism(Transform transform, Vector2 _h)
+        : Entity(transform), m_h(_h)
         {}
 
-    virtual float Distance(Vector3 point) const final override;
+    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };
