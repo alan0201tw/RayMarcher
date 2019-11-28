@@ -1,12 +1,20 @@
 #include "entity.hpp"
 
+void Entity::Update(float currentTime) const
+{
+	if (m_updateFunction)
+	{
+		m_updateFunction(currentTime);
+	}
+}
+
 DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
 {
     Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation), 
         (m_transform.position - point)) * (1.0f / m_transform.scale);
 
     DistanceInfo info;
-    info.color = Vector3(1.0f, 0.0f, 0.0f);
+    info.color = Vector3(1.0f, 1.0f, 0.0f);
     info.distance = linalg::length(pos) - m_radius;
 
     return info;
@@ -29,17 +37,17 @@ DistanceInfo Cube::GetDistanceInfo(Vector3 point, float time) const
     return info;
 }
 
-DistanceInfo Prism::GetDistanceInfo(Vector3 point, float time) const
-{
-    Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation), 
-        (m_transform.position - point)) * (1.0f / m_transform.scale);
-
-    Vector3 q = abs(pos);
-    
-    DistanceInfo info;
-    info.color = Vector3(1.0f, 1.0f, 1.0f);
-    info.distance = std::max(q.z - m_h.y,
-        std::max(q.x * 0.866025f + pos.y * 0.5f, -pos.y) - m_h.x * 0.5f);
-
-    return info;
-}
+//DistanceInfo Prism::GetDistanceInfo(Vector3 point, float time) const
+//{
+//    Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation), 
+//        (m_transform.position - point)) * (1.0f / m_transform.scale);
+//
+//    Vector3 q = abs(pos);
+//    
+//    DistanceInfo info;
+//    info.color = Vector3(1.0f, 1.0f, 1.0f);
+//    info.distance = std::max(q.z - m_h.y,
+//        std::max(q.x * 0.866025f + pos.y * 0.5f, -pos.y) - m_h.x * 0.5f);
+//
+//    return info;
+//}

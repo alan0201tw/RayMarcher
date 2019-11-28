@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <array>
 #include <limits>
+#include <vector>
 
 // vendor library
 
@@ -20,6 +21,8 @@
 #include "entity.hpp"
 #include "meshOperation.hpp"
 
+#include "scene.hpp"
+
 namespace
 {
     const size_t image_width = 800;
@@ -28,10 +31,13 @@ namespace
 
     unsigned char image[3 * image_width * image_height];
 
-    typedef std::array<float, 3> rgb01;
+    typedef Vector3 rgb01;
 
     // time parameters to support animation output
     float current_time = 0.0f;
+
+	std::vector< std::shared_ptr<IUpdate> > updatable;
+	Scene scene;
 }
 
 void write_to_image(size_t u, size_t v, rgb01 value)
@@ -47,44 +53,7 @@ void write_to_image(size_t u, size_t v, rgb01 value)
 
 DistanceInfo distfunc(Vector3 pos)
 {
-    Matrix3x3 rotation(
-        {std::cos(current_time * 5.0f), 0, std::sin(current_time * 5.0f)},
-        {0, 1, 0},
-        {-std::sin(current_time * 5.0f), 0, std::cos(current_time * 5.0f)}
-    );
-
-    Transform sphereTransform = 
-    {
-        Vector3(2.5f),
-        rotation,
-        Vector3(1.0f)
-    };
-
-    Transform cubeTransform = 
-    {
-        Vector3(0.0f),
-        Matrix3x3( {1,0,0}, {0,1,0}, {0,0,1} ),
-        Vector3(1.0f)
-    };
-
-    static std::shared_ptr<IDistance> sphere
-        = std::make_shared<Sphere>(sphereTransform, 1.0f);
-    static std::shared_ptr<IDistance> cube
-         = std::make_shared<Cube>(cubeTransform, Vector3(1.0f));
-    //static std::shared_ptr<Entity> prism
-    //    = std::make_shared<Prism>(Vector3(0.0f), Vector2(0.3f, 3.0f));
-    
-    static std::vector<std::shared_ptr<IDistance>> entityList
-        = { sphere, cube };
-    static std::shared_ptr<IDistance> blendingEntity
-        = std::make_shared<MeshBlender>(entityList, 3.0f);
-
-    auto* tmp = reinterpret_cast<Entity*>(sphere.get());
-    tmp->m_transform.position = Vector3(5.0f * (0.5f - current_time));
-    tmp = reinterpret_cast<Entity*>(cube.get());
-    tmp->m_transform.orientation = rotation;
-
-    return blendingEntity->GetDistanceInfo(pos, current_time);
+    return scene.blendingEntity->GetDistanceInfo(pos, current_time);
 }
 
 rgb01 GetColor(float u, float v)
@@ -191,11 +160,20 @@ int main(int argc, char* argv[])
     int image_index = 0;
     std::stringstream ss;
     current_time = 0.0f;
+
+	updatable.push_back(scene.cube);
+	updatable.push_back(scene.sphere);
+
     while(current_time <= 1.0f)
     {
         ss << "output/output_";
         ss << image_index;
         ss << ".png";
+
+		for(auto& upt : updatable)
+		{
+			upt->Update(current_time);
+		}
 
         Render();
         Output(ss.str());
