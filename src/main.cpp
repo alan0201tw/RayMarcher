@@ -33,10 +33,6 @@ namespace
 
     typedef Vector3 rgb01;
 
-    // time parameters to support animation output
-    float current_time = 0.0f;
-
-	std::vector< std::shared_ptr<IUpdate> > updatable;
 	Scene scene;
 }
 
@@ -51,12 +47,12 @@ void write_to_image(size_t u, size_t v, rgb01 value)
     image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255 * value[2]);
 }
 
-DistanceInfo distfunc(Vector3 pos)
+DistanceInfo distfunc(Vector3 pos, float currentTime)
 {
-    return scene.blendingEntity->GetDistanceInfo(pos, current_time);
+    return scene.GetDistanceInfo(pos, currentTime);
 }
 
-rgb01 GetColor(float u, float v)
+rgb01 GetColor(float u, float v, float currentTime)
 {
     static Camera camera(
         Vector3(3.0f, 3.0f, 10.0f),
@@ -82,21 +78,15 @@ rgb01 GetColor(float u, float v)
         if (dist < EPSILON || totalDist > MAX_DIST)
             break;
 
-        auto info = distfunc(pos); // Evalulate the distance at the current point
+        auto info = distfunc(pos, currentTime); // Evalulate the distance at the current point
         dist = info.distance;
         totalDist += dist;
         pos += dist * ray.GetDirection(); // Advance the point forwards in the ray direction by the distance
     
         if(dist < EPSILON)
         {
-            Vector3 eps_x = Vector3(EPSILON * 0.1f, 0.0f, 0.0f);
-            Vector3 eps_y = Vector3(0.0f, EPSILON * 0.1f, 0.0f);
-            Vector3 eps_z = Vector3(0.0f, 0.0f, EPSILON * 0.1f);
-            Vector3 normal = linalg::normalize(Vector3(
-                distfunc(pos + eps_x).distance - distfunc(pos - eps_x).distance,
-                distfunc(pos + eps_y).distance - distfunc(pos - eps_y).distance,
-                distfunc(pos + eps_z).distance - distfunc(pos - eps_z).distance));
-
+            Vector3 normal = scene.EvaluateNormal(pos, currentTime, EPSILON);
+            
             float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
             float specular = pow(diffuse, 32.0f);
 
@@ -110,7 +100,7 @@ rgb01 GetColor(float u, float v)
     return {0, 0, 0};
 }
 
-static void Render()
+static void Render(float currentTime)
 {
     // using thread pool for parallelism
     // for simple scene, thread overhead actually slows down the process
@@ -120,12 +110,14 @@ static void Render()
 
     for(size_t i = 0; i < image_width; i++)
     {
-        auto result = pool.enqueue([](size_t i)
+        auto result = pool.enqueue([currentTime](size_t i)
         {
             for(size_t j = 0; j < image_height; j++)
             {
-                rgb01 color = GetColor((float)i / (float)image_width, 
-                    (float)j / (float)image_height);
+                rgb01 color = GetColor(
+                    (float)i / (float)image_width, 
+                    (float)j / (float)image_height,
+                    currentTime);
 
                 write_to_image(i, j, color);
             }
@@ -157,30 +149,26 @@ static void Output(std::string fileName)
 
 int main(int argc, char* argv[])
 {
-    int image_index = 0;
+    int imageIndex = 0;
     std::stringstream ss;
-    current_time = 0.0f;
 
-	updatable.push_back(scene.cube);
-	updatable.push_back(scene.sphere);
+    // time parameters to support animation output
+    float currentTime = 0.0f;
 
-    while(current_time <= 1.0f)
+    while(currentTime <= 1.0f)
     {
         ss << "output/output_";
-        ss << image_index;
+        ss << imageIndex;
         ss << ".png";
 
-		for(auto& upt : updatable)
-		{
-			upt->Update(current_time);
-		}
-
-        Render();
+        scene.Update(currentTime);
+		
+        Render(currentTime);
         Output(ss.str());
 
-        current_time += 0.01f;
+        currentTime += 0.01f;
 
-        image_index++;
+        imageIndex++;
         ss.str(std::string());
     }
 }

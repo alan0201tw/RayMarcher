@@ -1,42 +1,31 @@
 #pragma once
 
 #include "transform.hpp"
+#include "common.h"
 
 #include <functional>
 
-struct DistanceInfo
+class Entity : public IDistance
 {
-    float distance;
-    Vector3 color;
-};
-
-class IDistance
-{
-public:
-    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const = 0;
-};
-
-class IUpdate
-{
-public:
-	virtual void Update(float currentTime) const = 0;
-};
-
-class Entity : public IDistance, public IUpdate
-{
-public:
+protected:
 	Transform m_transform;
-	std::function<void(float)> m_updateFunction;
 
-	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const = 0;
-	virtual void Update(float currentTime) const final override;
+public:
+	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const override = 0;
+
+    // getter and setter for transform properties
+    Vector3   const & position   () const { return m_transform.position; }
+    Vector3         & position   ()       { return m_transform.position; }
+    Matrix3x3 const & orientation() const { return m_transform.orientation; }
+    Matrix3x3       & orientation()       { return m_transform.orientation; }
+    Vector3   const & scale      () const { return m_transform.scale; }
+    Vector3         & scale      ()       { return m_transform.scale; }
 
 protected:
     explicit Entity(
-        Transform transform,
-		std::function<void(float)> updateFunction
+        Transform transform
         )
-        : m_transform(transform), m_updateFunction(updateFunction)
+        : m_transform(transform)
           {};
 
 };
@@ -48,10 +37,9 @@ private:
 public:
     explicit Sphere(
 		Transform transform, 
-		float radius,
-		std::function<void(float)> updateFunction = nullptr
+		float radius
 		)
-        : Entity(transform, updateFunction), m_radius(radius)
+        : Entity(transform), m_radius(radius)
         {}
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
@@ -64,24 +52,10 @@ private:
 public:
     explicit Cube(
 		Transform transform, 
-		Vector3 extent,
-		std::function<void(float)> updateFunction = nullptr
+		Vector3 extent
 		)
-        : Entity(transform, updateFunction), m_extent(extent)
+        : Entity(transform), m_extent(extent)
         {}
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };
-
-//class Prism final : public Entity
-//{
-//private:
-//    Vector2 m_h;
-//
-//public:
-//    explicit Prism(Transform transform, Vector2 _h)
-//        : Entity(transform), m_h(_h)
-//        {}
-//
-//    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
-//};

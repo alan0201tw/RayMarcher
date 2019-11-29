@@ -1,14 +1,14 @@
 #pragma once
 
-#include "entity.hpp"
-
 #include <memory>
 #include <vector>
+
+#include "entity.hpp"
 
 class MeshBlender final : public IDistance
 {
 private:
-    std::vector< std::shared_ptr<IDistance> > m_entities;
+    std::vector<IDistanceRef> m_entities;
 
     const float m_k;
 
@@ -17,7 +17,7 @@ private:
 
 public:
     explicit MeshBlender(
-        std::vector< std::shared_ptr<IDistance> > entities,
+        std::vector<IDistanceRef> entities,
         float k
         )
         : m_entities(entities), m_k(k) {}

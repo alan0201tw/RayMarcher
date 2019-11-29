@@ -1,13 +1,5 @@
 #include "entity.hpp"
 
-void Entity::Update(float currentTime) const
-{
-	if (m_updateFunction)
-	{
-		m_updateFunction(currentTime);
-	}
-}
-
 DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
 {
     Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation), 
