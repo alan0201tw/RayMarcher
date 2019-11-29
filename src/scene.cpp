@@ -41,8 +41,17 @@ Scene::Scene()
 		Vector3(1.0f)
 	};
 
-	sphere = std::make_shared<Sphere>(sphereTransform, 1.0f);
-	cube = std::make_shared<Cube>(cubeTransform, Vector3(1.0f));
+	sphere = std::make_shared<Sphere>(
+		sphereTransform, 
+		1.0f, 
+		Vector3(251,247,172) / 255.0f
+		);
+
+	cube = std::make_shared<Cube>(
+		cubeTransform, 
+		Vector3(1.0f),
+		Vector3(107,175,238) / 255.0f
+		);
 
 	std::vector<IDistanceRef> entityList
 		= { sphere, cube };

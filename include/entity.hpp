@@ -34,12 +34,15 @@ class Sphere final : public Entity
 {
 private:
     float m_radius;
+    Vector3 m_color;
+
 public:
     explicit Sphere(
 		Transform transform, 
-		float radius
+		float radius, 
+        Vector3 color
 		)
-        : Entity(transform), m_radius(radius)
+        : Entity(transform), m_radius(radius), m_color(color)
         {}
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
@@ -49,12 +52,14 @@ class Cube final : public Entity
 {
 private:
     Vector3 m_extent;
+    Vector3 m_color;
 public:
     explicit Cube(
-		Transform transform, 
-		Vector3 extent
+		Transform transform,
+		Vector3 extent,
+        Vector3 color
 		)
-        : Entity(transform), m_extent(extent)
+        : Entity(transform), m_extent(extent), m_color(color)
         {}
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;

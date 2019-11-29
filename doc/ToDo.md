@@ -3,8 +3,8 @@
 
     * Some more primitives
 
-    * Lighting (Phong or Blinn Phong, entity contain material, material contain texture)
-    * Transform (Translate and Rotation, mimic Ray tracer)
+    * (O) Lighting (Phong or Blinn Phong, entity contain material, material contain texture)
+    * (O) Transform (Translate and Rotation, mimic Ray tracer)
     * (?) Precompiled Header - on stb_image and thread_pool ?
     * (?) Triangle Mesh
     * (?) Texture mapping
@@ -19,6 +19,7 @@
         * I cannot use those in this project, so it might took a while for me to implement those.
 
     * Testing, maybe?
+        * Google test?
 
     * Analysis ( with Ray tracer, quality, performance ... etc )
         * Compare shared_ptr and raw pointer performance

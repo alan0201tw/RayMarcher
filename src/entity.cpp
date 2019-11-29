@@ -6,7 +6,7 @@ DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
         (m_transform.position - point)) * (1.0f / m_transform.scale);
 
     DistanceInfo info;
-    info.color = Vector3(1.0f, 1.0f, 0.0f);
+    info.color = m_color;
     info.distance = linalg::length(pos) - m_radius;
 
     return info;
@@ -23,7 +23,7 @@ DistanceInfo Cube::GetDistanceInfo(Vector3 point, float time) const
         std::min(o[0], 0.0f), std::min(o[1], 0.0f)), std::min(o[2], 0.0f));
 
     DistanceInfo info;
-    info.color = Vector3(0.0f, 1.0f, 0.0f);
+    info.color = m_color;
     info.distance = ud + n;
 
     return info;
