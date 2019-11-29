@@ -12,6 +12,8 @@ public:
         m_direction = direction;
     }
 
+    ~Ray() {}
+
     inline Vector3 GetOrigin() const       { return m_origin; }
     inline Vector3 GetDirection() const    { return m_direction; }
     inline Vector3 GetPointAtParameter(float t) const { return m_origin + t * m_direction; }

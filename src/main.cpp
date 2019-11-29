@@ -1,3 +1,11 @@
+#ifdef BUILDING_FOR_PYTHON_TESTING
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/operators.h>
+
+namespace py = pybind11;
+#endif
+
 // cpp standard library
 #include <iostream>
 #include <sstream>
@@ -47,11 +55,6 @@ void write_to_image(size_t u, size_t v, rgb01 value)
     image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255 * value[2]);
 }
 
-DistanceInfo distfunc(Vector3 pos, float currentTime)
-{
-    return scene.GetDistanceInfo(pos, currentTime);
-}
-
 rgb01 GetColor(float u, float v, float currentTime)
 {
     static Camera camera(
@@ -78,7 +81,7 @@ rgb01 GetColor(float u, float v, float currentTime)
         if (dist < EPSILON || totalDist > MAX_DIST)
             break;
 
-        auto info = distfunc(pos, currentTime); // Evalulate the distance at the current point
+        auto info = scene.GetDistanceInfo(pos, currentTime); // Evalulate the distance at the current point
         dist = info.distance;
         totalDist += dist;
         pos += dist * ray.GetDirection(); // Advance the point forwards in the ray direction by the distance
@@ -147,6 +150,8 @@ static void Output(std::string fileName)
     }
 }
 
+#ifndef BUILDING_FOR_PYTHON_TESTING
+
 int main(int argc, char* argv[])
 {
     int imageIndex = 0;
@@ -172,3 +177,18 @@ int main(int argc, char* argv[])
         ss.str(std::string());
     }
 }
+
+#else
+
+PYBIND11_MODULE(_rayMarcher, mod)
+{
+    mod.doc() = "Ray marcher";
+
+    py::class_<Scene>(mod, "Scene")
+        .def(py::init<>());
+
+    mod.def("render", &Render, "render the image");
+    mod.def("output", &Output, "output the image");
+}
+
+#endif

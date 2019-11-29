@@ -29,6 +29,8 @@ public:
         m_horizontal = 2.0f * half_width * m_camera_right;
         m_vertical = 2.0f * half_height * m_camera_up;
     }
+
+    ~Camera() {}
     
     inline Ray get_ray(float u, float v) const
     {

@@ -27,7 +27,7 @@ protected:
         )
         : m_transform(transform)
           {};
-
+    virtual ~Entity() {};
 };
 
 class Sphere final : public Entity
@@ -45,6 +45,8 @@ public:
         : Entity(transform), m_radius(radius), m_color(color)
         {}
 
+    ~Sphere() {};
+
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };
 
@@ -61,6 +63,8 @@ public:
 		)
         : Entity(transform), m_extent(extent), m_color(color)
         {}
+
+    ~Cube() {};
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };

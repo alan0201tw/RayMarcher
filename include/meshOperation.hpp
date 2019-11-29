@@ -22,5 +22,7 @@ public:
         )
         : m_entities(entities), m_k(k) {}
 
+    ~MeshBlender() {}
+
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };

@@ -15,3 +15,9 @@ output/*
 # Visual studio solution/project files
 *.sln
 *.vcxproj*
+
+# shared objects and cache for testing
+*.so
+*cache*
+test/bin/*
+test/*.png
