@@ -6,7 +6,7 @@
     * (O) Lighting (Phong or Blinn Phong, entity contain material, material contain texture)
     * (O) Transform (Translate and Rotation, mimic Ray tracer)
     * (?) Precompiled Header - on stb_image and thread_pool ?
-    * (?) Triangle Mesh
+    * (O) Triangle Mesh
     * (?) Texture mapping
         * It's hard to come up with a elegant architecture for this.
         * To do texture mapping, multiple rays is required to estimate UVs, like how normals are obtained.
@@ -24,3 +24,8 @@
     * Analysis ( with Ray tracer, quality, performance ... etc )
         * Compare shared_ptr and raw pointer performance
         * That I do not call make_shared while multi-threading
+
+    * BVH or Parallel triangle SDF in triangle mesh
+        * Current performance is way too poor
+        * One image needs a few seconds?
+        * Triangle lighting quality is poor, maybe lower epsilon for evaluating normal?
