@@ -2,10 +2,16 @@
 
 #include <iostream>
 
+#include "mesh.hpp"
+
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+
 namespace
 {
 	std::shared_ptr<Entity> sphere;
 	std::shared_ptr<Entity> cube;
+	std::shared_ptr<Entity> bunnyMesh;
 }
 
 DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
@@ -58,7 +64,63 @@ Scene::Scene()
 	IDistanceRef blendingEntity
 		= std::make_shared<MeshBlender>(entityList, 3.0f);
 
-    m_distanceFuncProvider = blendingEntity;
+	// Load Bunny Mesh
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::string warn;
+	std::string err;
+
+	tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, "./resources/bunnyLow.obj");
+	if (!warn.empty())
+	{
+		std::cout << warn << std::endl;
+	}
+	if (!err.empty())
+	{
+		std::cerr << err << std::endl;
+	}
+
+	std::vector<Triangle> bunny_list;
+	// Loop over shapes
+	for (size_t s = 0; s < shapes.size(); s++)
+	{
+		// Loop over faces(polygon)
+		size_t index_offset = 0;
+		for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++)
+		{
+			size_t fv = shapes[s].mesh.num_face_vertices[f];
+
+			std::array<Vector3, 3> vertices;
+			// Loop over vertices in the face.
+			for (size_t v = 0; v < fv; v++)
+			{
+				// access to vertex
+				tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
+				tinyobj::real_t vx = attrib.vertices[3 * idx.vertex_index + 0];
+				tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
+				tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
+
+				vertices[v] = Vector3(vx, vy, vz) * 5.0f;
+			}
+
+			bunny_list.push_back(Triangle(cubeTransform, vertices));
+
+			index_offset += fv;
+		}
+	}
+
+	bunnyMesh = std::make_shared<TriangleMesh>(cubeTransform, bunny_list);
+
+    //m_distanceFuncProvider = blendingEntity;
+	float angle = 3.14;
+	bunnyMesh->orientation() = Matrix3x3(
+		{ std::cos(angle), 0, std::sin(angle) },
+		{ 0, 1, 0 },
+		{ -std::sin(angle), 0, std::cos(angle) }
+	);
+
+	m_distanceFuncProvider = bunnyMesh;
 }
 
 Vector3 Scene::EvaluateNormal(Vector3 point, float time, float epsilon) const

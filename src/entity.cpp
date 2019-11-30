@@ -2,7 +2,7 @@
 
 DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
 {
-    Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation), 
+	const Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation),
         (m_transform.position - point)) * (1.0f / m_transform.scale);
 
     DistanceInfo info;
@@ -14,7 +14,7 @@ DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
 
 DistanceInfo Cube::GetDistanceInfo(Vector3 point, float time) const
 {
-    Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation), 
+	const Vector3 pos = linalg::mul( linalg::inverse(m_transform.orientation),
         (m_transform.position - point)) * (1.0f / m_transform.scale);
 
     Vector3 o = abs(pos) - m_extent;
