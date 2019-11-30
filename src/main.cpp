@@ -75,7 +75,7 @@ rgb01 GetColor(float u, float v, float currentTime)
     Vector3 pos = ray.GetOrigin();
     float dist = EPSILON;
 
-    for (int i = 0; i < MAX_ITER; i++)
+    for (int i = 0; i < MAX_ITER; ++i)
     {
         // Either we've hit the object or hit nothing at all, either way we should break out of the loop
         if (dist < EPSILON || totalDist > MAX_DIST)
@@ -111,11 +111,11 @@ static void Render(float currentTime)
 #if 1
     ThreadPool pool(8);
 
-    for(size_t i = 0; i < image_width; i++)
+    for(size_t i = 0; i < image_width; ++i)
     {
         auto result = pool.enqueue([currentTime](size_t i)
         {
-            for(size_t j = 0; j < image_height; j++)
+            for(size_t j = 0; j < image_height; ++j)
             {
                 rgb01 color = GetColor(
                     (float)i / (float)image_width, 
@@ -127,9 +127,9 @@ static void Render(float currentTime)
         }, i);
     }
 #else // naive implementation
-    for(size_t i = 0; i < image_width; i++)
+    for(size_t i = 0; i < image_width; ++i)
     {
-        for(size_t j = 0; j < image_height; j++)
+        for(size_t j = 0; j < image_height; ++j)
         {
             rgb01 color = GetColor((float)i / (float)image_width, 
                   (float)j / (float)image_height);
@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
 
         currentTime += 0.01f;
 
-        imageIndex++;
+        ++imageIndex;
         ss.str(std::string());
     }
 }
