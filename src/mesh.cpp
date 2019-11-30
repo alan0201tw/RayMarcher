@@ -2,25 +2,24 @@
 
 DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 {
-	const Vector3 pos = linalg::mul(linalg::inverse(m_transform.orientation),
-		(m_transform.position - point)) * (1.0f / m_transform.scale);
+	const Vector3 pos = ApplyInverseTransform(m_transform, point);
 
 	const Vector3 a = m_vertices[0];
 	const Vector3 b = m_vertices[1];
 	const Vector3 c = m_vertices[2];
 	const Vector3 p = pos;
 
-	Vector3 ba = b - a; Vector3 pa = p - a;
-	Vector3 cb = c - b; Vector3 pb = p - b;
-	Vector3 ac = a - c; Vector3 pc = p - c;
-	Vector3 nor = cross(ba, ac);
+	const Vector3 ba = b - a; const Vector3 pa = p - a;
+	const Vector3 cb = c - b; const Vector3 pb = p - b;
+	const Vector3 ac = a - c; const Vector3 pc = p - c;
+	const Vector3 nor = -m_normal;
 
 	DistanceInfo info;
-
+	// TEST : add std::abs to avoid culling, attempt to improve lighting quality
 	info.distance = std::sqrt(
-		(sign(dot(cross(ba, nor), pa)) +
-			sign(dot(cross(cb, nor), pb)) +
-			sign(dot(cross(ac, nor), pc)) < 2.0f)
+		(std::abs(sign(dot(cross(ba, nor), pa)) + 
+		 sign(dot(cross(cb, nor), pb)) +
+		 sign(dot(cross(ac, nor), pc))) < 2.0f)
 		?
 		std::min(std::min(
 			linalg::length2(ba*std::clamp(dot(ba, pa) / linalg::length2(ba), 0.0f, 1.0f) - pa),
@@ -29,16 +28,17 @@ DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 		:
 		dot(nor, pa)*dot(nor, pa) / linalg::length2(nor));
 
+	info.distance *= m_transform.scale;
+
 	// TMP
-	info.color = Vector3(1, 1, 1);
+	info.color = m_color;
 
 	return info;
 }
 
 DistanceInfo TriangleMesh::GetDistanceInfo(Vector3 point, float time) const
 {
-	const Vector3 pos = linalg::mul(linalg::inverse(m_transform.orientation),
-		(m_transform.position - point)) * (1.0f / m_transform.scale);
+	const Vector3 pos = ApplyInverseTransform(m_transform, point);
 
 	DistanceInfo info;
 	info.distance = 1e9;
@@ -51,6 +51,8 @@ DistanceInfo TriangleMesh::GetDistanceInfo(Vector3 point, float time) const
 			info = currentInfo;
 		}
 	}
+
+	info.distance *= m_transform.scale;
 
 	return info;
 }

@@ -18,8 +18,8 @@ public:
     Vector3         & position   ()       { return m_transform.position; }
     Matrix3x3 const & orientation() const { return m_transform.orientation; }
     Matrix3x3       & orientation()       { return m_transform.orientation; }
-    Vector3   const & scale      () const { return m_transform.scale; }
-    Vector3         & scale      ()       { return m_transform.scale; }
+    float     const & scale      () const { return m_transform.scale; }
+	float           & scale      ()       { return m_transform.scale; }
 
 protected:
     explicit Entity(

@@ -29,3 +29,8 @@
         * Current performance is way too poor
         * One image needs a few seconds?
         * Triangle lighting quality is poor, maybe lower epsilon for evaluating normal?
+
+    * (O) Transform : Use transpost for inversing rotation
+
+    * Improve lighting quality
+        * Try sphere marching? -> compute every distance and use as ray march step size

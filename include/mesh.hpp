@@ -11,22 +11,25 @@ private:
 	std::array<Vector3, 3> m_vertices;
 	Vector3 m_normal;
 
+	Vector3 m_color;
+
 	inline float sign(float value) const
 	{
 		// simulate glsl sign function
 		// sign returns -1.0 if x is less than 0.0, 0.0 if x is equal to 0.0, and +1.0 if x is greater than 0.0.
-		return (value == 0.0f) ? 0.0f : ((value < 0.0f) ? -1.0f : 1.0f);
+		if (value == 0.0f) return 0.0f;
+		return (value < 0.0f) ? -1.0f : 1.0f;
 	}
 
 public:
 	explicit Triangle(
 		Transform transform,
-		std::array<Vector3, 3> vertices
+		std::array<Vector3, 3> vertices,
+		Vector3 color
 		)
-		: Entity(transform), m_vertices(vertices)
+		: Entity(transform), m_vertices(vertices), m_color(color)
 		{
-			
-			m_normal = linalg::normalize(linalg::cross(m_vertices[1] - m_vertices[0], m_vertices[2] - m_vertices[0]));
+			m_normal = safe_normalize(linalg::cross(m_vertices[1] - m_vertices[0], m_vertices[2] - m_vertices[0]));
 		}
 
 	~Triangle() {};

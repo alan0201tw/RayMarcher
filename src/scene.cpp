@@ -24,7 +24,7 @@ void Scene::Update(float currentTime) const
 {
 	sphere->position() = Vector3(8.0f * (0.5f - currentTime));
 
-    cube->orientation() = Matrix3x3(
+	bunnyMesh->orientation() = Matrix3x3(
 		{ std::cos(currentTime * 5.0f), 0, std::sin(currentTime * 5.0f) },
 		{ 0, 1, 0 },
 		{-std::sin(currentTime * 5.0f), 0, std::cos(currentTime * 5.0f) }
@@ -37,32 +37,34 @@ Scene::Scene()
 	{
 		Vector3(2.5f),
 		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
-		Vector3(1.0f)
+		1.0f
 	};
 
-	const Transform cubeTransform =
+	const Transform bunnyTransform =
 	{
 		Vector3(0.0f),
 		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
-		Vector3(1.0f)
+		5.0f
+	};
+
+	const Transform identityTransform =
+	{
+		Vector3(0.0f),
+		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
+		1.0f
 	};
 
 	sphere = std::make_shared<Sphere>(
 		sphereTransform, 
-		1.0f, 
+		1.0f,
 		Vector3(251,247,172) / 255.0f
 		);
 
 	cube = std::make_shared<Cube>(
-		cubeTransform, 
+		identityTransform,
 		Vector3(1.0f),
 		Vector3(107,175,238) / 255.0f
 		);
-
-	std::vector<IDistanceRef> entityList
-		= { sphere, cube };
-	IDistanceRef blendingEntity
-		= std::make_shared<MeshBlender>(entityList, 3.0f);
 
 	// Load Bunny Mesh
 	tinyobj::attrib_t attrib;
@@ -82,6 +84,7 @@ Scene::Scene()
 	}
 
 	std::vector<Triangle> bunny_list;
+	bunny_list.reserve(shapes.size());
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++)
 	{
@@ -101,38 +104,43 @@ Scene::Scene()
 				tinyobj::real_t vy = attrib.vertices[3 * idx.vertex_index + 1];
 				tinyobj::real_t vz = attrib.vertices[3 * idx.vertex_index + 2];
 
-				vertices[v] = Vector3(vx, vy, vz) * 5.0f;
+				vertices[v] = Vector3(vx, vy, vz);
 			}
 
-			bunny_list.push_back(Triangle(cubeTransform, vertices));
+			bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
 
 			index_offset += fv;
 		}
 	}
 
-	bunnyMesh = std::make_shared<TriangleMesh>(cubeTransform, bunny_list);
+	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, bunny_list);
 
-    //m_distanceFuncProvider = blendingEntity;
-	float angle = 3.14;
-	bunnyMesh->orientation() = Matrix3x3(
-		{ std::cos(angle), 0, std::sin(angle) },
-		{ 0, 1, 0 },
-		{ -std::sin(angle), 0, std::cos(angle) }
-	);
+	std::vector<IDistanceRef> entityList
+		= { sphere, bunnyMesh };
+	IDistanceRef blendingEntity
+		= std::make_shared<MeshBlender>(entityList, 3.0f);
 
-	m_distanceFuncProvider = bunnyMesh;
+    m_distanceFuncProvider = blendingEntity;
+	//m_distanceFuncProvider = bunnyMesh;
 }
 
 Vector3 Scene::EvaluateNormal(Vector3 point, float time, float epsilon) const
 {
+	// TEST : test to check if this improves the lighting on triangle mesh - bunnyLow
+	// TEST Result : does not work
+	// epsilon *= 0.01f;
+
+	// TEST : this is even worse
+	//epsilon = std::numeric_limits<float>::epsilon();
+
 	const Vector3 eps_x = Vector3(epsilon, 0.0f, 0.0f);
 	const Vector3 eps_y = Vector3(0.0f, epsilon, 0.0f);
 	const Vector3 eps_z = Vector3(0.0f, 0.0f, epsilon);
 
-	Vector3 normal = linalg::normalize(Vector3(
+	Vector3 normal = Vector3(
 		GetDistanceInfo(point + eps_x, time).distance - GetDistanceInfo(point - eps_x, time).distance,
 		GetDistanceInfo(point + eps_y, time).distance - GetDistanceInfo(point - eps_y, time).distance,
-		GetDistanceInfo(point + eps_z, time).distance - GetDistanceInfo(point - eps_z, time).distance));
+		GetDistanceInfo(point + eps_z, time).distance - GetDistanceInfo(point - eps_z, time).distance);
 
-	return normal;
+	return safe_normalize(normal);
 }
