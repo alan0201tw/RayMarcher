@@ -35,7 +35,7 @@ public:
     inline Ray get_ray(float u, float v) const
     {
         return Ray(m_origin, 
-            m_lower_left_corner + u * m_horizontal + v * m_vertical - m_origin);
+            normalize(m_lower_left_corner + u * m_horizontal + v * m_vertical - m_origin));
     }
 
     Vector3 m_lower_left_corner; 

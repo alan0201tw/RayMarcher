@@ -50,9 +50,9 @@ void write_to_image(size_t u, size_t v, rgb01 value)
     value[1] = std::sqrt(value[1]);
     value[2] = std::sqrt(value[2]);
 
-    image[v * 3 * image_width + u * 3 + 0] = static_cast<unsigned char>(255 * value[0]);
-    image[v * 3 * image_width + u * 3 + 1] = static_cast<unsigned char>(255 * value[1]);
-    image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255 * value[2]);
+    image[v * 3 * image_width + u * 3 + 0] = static_cast<unsigned char>(255.0f * value[0]);
+    image[v * 3 * image_width + u * 3 + 1] = static_cast<unsigned char>(255.0f * value[1]);
+    image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255.0f * value[2]);
 }
 
 rgb01 GetColor(float u, float v, float currentTime)
@@ -83,26 +83,27 @@ rgb01 GetColor(float u, float v, float currentTime)
 
         auto info = scene.GetDistanceInfo(pos, currentTime); // Evalulate the distance at the current point
         dist = info.distance;
-        totalDist += dist;
-        pos += dist * ray.GetDirection(); // Advance the point forwards in the ray direction by the distance
     
-        if(dist < EPSILON)
+        if(dist <= EPSILON)
         {
             Vector3 normal = scene.EvaluateNormal(pos, currentTime, EPSILON);
-            
-			// TEST : check if lighting quality is caused by this
-			// TEST Result : this helps ! But the result image is still a bit noisy though.
 
-            //float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
-			float diffuse = std::abs(dot(-ray.GetDirection(), normal));
+            float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
+			// simulate the glsl saturate function : https://developer.download.nvidia.com/cg/saturate.html
+			diffuse = std::max(0.0f, std::min(1.0f, diffuse));
+
             float specular = pow(diffuse, 32.0f);
 
             float light_intensity = diffuse + specular;
-            Vector3 color = 
-                std::clamp(light_intensity, 0.0f, 1.0f) * info.color;
+            Vector3 color = std::clamp(light_intensity, 0.0f, 1.0f) * info.color;
 
             return color;
         }
+
+		// Crutial : update pos after we evaluate normal, or we might get a penetrated normal, which leads to lighting bug
+
+		totalDist += dist;
+		pos += dist * ray.GetDirection(); // Advance the point forwards in the ray direction by the distance
     }
     return {0, 0, 0};
 }
