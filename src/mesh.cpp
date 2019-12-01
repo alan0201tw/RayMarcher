@@ -17,9 +17,9 @@ DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 	DistanceInfo info;
 	// TEST : add std::abs to avoid culling, attempt to improve lighting quality
 	info.distance = std::sqrt(
-		(std::abs(sign(dot(cross(ba, nor), pa)) + 
+		(sign(dot(cross(ba, nor), pa)) + 
 		 sign(dot(cross(cb, nor), pb)) +
-		 sign(dot(cross(ac, nor), pc))) < 2.0f)
+		 sign(dot(cross(ac, nor), pc)) < 2.0f)
 		?
 		std::min(std::min(
 			linalg::length2(ba*std::clamp(dot(ba, pa) / linalg::length2(ba), 0.0f, 1.0f) - pa),

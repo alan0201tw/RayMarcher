@@ -90,7 +90,11 @@ rgb01 GetColor(float u, float v, float currentTime)
         {
             Vector3 normal = scene.EvaluateNormal(pos, currentTime, EPSILON);
             
-            float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
+			// TEST : check if lighting quality is caused by this
+			// TEST Result : this helps ! But the result image is still a bit noisy though.
+
+            //float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
+			float diffuse = std::abs(dot(-ray.GetDirection(), normal));
             float specular = pow(diffuse, 32.0f);
 
             float light_intensity = diffuse + specular;

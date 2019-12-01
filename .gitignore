@@ -21,3 +21,6 @@ output/*
 *cache*
 test/bin/*
 test/*.png
+
+# allow exported file collections
+!/exports/*.mp4
