@@ -50,9 +50,19 @@ void write_to_image(size_t u, size_t v, rgb01 value)
     value[1] = std::sqrt(value[1]);
     value[2] = std::sqrt(value[2]);
 
-    image[v * 3 * image_width + u * 3 + 0] = static_cast<unsigned char>(255.0f * value[0]);
-    image[v * 3 * image_width + u * 3 + 1] = static_cast<unsigned char>(255.0f * value[1]);
-    image[v * 3 * image_width + u * 3 + 2] = static_cast<unsigned char>(255.0f * value[2]);
+    unsigned char r255 = static_cast<unsigned char>(255.99f * value[0]);
+    unsigned char g255 = static_cast<unsigned char>(255.99f * value[1]);
+    unsigned char b255 = static_cast<unsigned char>(255.99f * value[2]);
+
+    unsigned char lower_bound = 0, upper_bound = 255;
+
+    r255 = std::clamp(r255, lower_bound, upper_bound);
+    g255 = std::clamp(g255, lower_bound, upper_bound);
+    b255 = std::clamp(b255, lower_bound, upper_bound);
+
+    image[v * 3 * image_width + u * 3 + 0] = r255;
+    image[v * 3 * image_width + u * 3 + 1] = g255;
+    image[v * 3 * image_width + u * 3 + 2] = b255;
 }
 
 rgb01 GetColor(float u, float v, float currentTime)
@@ -66,7 +76,7 @@ rgb01 GetColor(float u, float v, float currentTime)
     );
 
     const int MAX_ITER = 100; // 100 is a safe number to use, it won't produce too many artifacts and still be quite fast
-    const float MAX_DIST = 20.0f; // Make sure you change this if you have objects farther than 20 units away from the camera
+    const float MAX_DIST = 200.0f; // Make sure you change this if you have objects farther than 20 units away from the camera
     const float EPSILON = 0.001f; // At this distance we are close enough to the object that we have essentially hit it
 
     Ray ray = camera.get_ray(u, v);
@@ -83,21 +93,33 @@ rgb01 GetColor(float u, float v, float currentTime)
 
         auto info = scene.GetDistanceInfo(pos, currentTime); // Evalulate the distance at the current point
         dist = info.distance;
-    
+
         if(dist <= EPSILON)
         {
-            Vector3 normal = scene.EvaluateNormal(pos, currentTime, EPSILON);
+            // Reference : https://github.com/SebLague/Ray-Marching/blob/master/Assets/Scripts/SDF/Raymarching.compute#L223
+            // Use the point slightly away from surface to evaluate normal
+            // TEST Result : HOLY SHIT, this works great.
+            const Vector3 pointOnSurface = pos + (dist - EPSILON) * ray.GetDirection();
+            const Vector3 normal = scene.EvaluateNormal(pointOnSurface, currentTime, EPSILON);
+            const Vector3 lightDirection = safe_normalize(-ray.GetDirection());
 
-            float diffuse = std::max(0.0f, dot(-ray.GetDirection(), normal));
+            const Vector3 I = -lightDirection;
+            const Vector3 N = normal;
+            const Vector3 reflectLightDir = I - 2.0f * linalg::dot(N, I) * N;
+
+            const Vector3 cameraDirection = safe_normalize(ray.GetOrigin() - pos);
+
+            float diffuse = std::max(0.0f, dot(lightDirection, normal));
 			// simulate the glsl saturate function : https://developer.download.nvidia.com/cg/saturate.html
-			diffuse = std::max(0.0f, std::min(1.0f, diffuse));
+			// diffuse = std::max(0.0f, std::min(1.0f, diffuse));
 
-            float specular = pow(diffuse, 32.0f);
+            float specular = 
+                std::pow(std::max(linalg::dot(reflectLightDir, cameraDirection), 0.0f), 32.0f);
 
-            float light_intensity = diffuse + specular;
-            Vector3 color = std::clamp(light_intensity, 0.0f, 1.0f) * info.color;
+            Vector3 color = 
+                std::clamp(diffuse, 0.0f, 1.0f) * info.color + specular;
 
-            return color;
+            return linalg::clamp(color, 0.0f, 1.0f);
         }
 
 		// Crutial : update pos after we evaluate normal, or we might get a penetrated normal, which leads to lighting bug

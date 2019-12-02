@@ -32,5 +32,6 @@
 
     * (O) Transform : Use transpost for inversing rotation
 
-    * Improve lighting quality
+    * (O) Improve lighting quality
         * Try sphere marching? -> compute every distance and use as ray march step size
+        * Use new position for normal evaluation : a point slightly out of the point on surface, referencing SebLague's RayMarching repo
