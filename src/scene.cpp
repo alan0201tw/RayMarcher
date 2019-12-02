@@ -10,7 +10,7 @@
 namespace
 {
 	std::shared_ptr<Entity> sphere;
-	std::shared_ptr<Entity> cube;
+	std::shared_ptr<Entity> spherePlane;
 	std::shared_ptr<Entity> bunnyMesh;
 }
 
@@ -47,6 +47,13 @@ Scene::Scene()
 		5.0f
 	};
 
+	const Transform spherePlaneTransform = 
+	{
+		Vector3(0.0f, -255.0f, 0.0f),
+		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
+		250.0f
+	};
+
 	const Transform identityTransform =
 	{
 		Vector3(0.0f),
@@ -57,13 +64,13 @@ Scene::Scene()
 	sphere = std::make_shared<Sphere>(
 		sphereTransform, 
 		1.0f,
-		Vector3(251,247,172) / 255.0f
+		Vector3(173, 245, 255) / 255.0f
 		);
 
-	cube = std::make_shared<Cube>(
-		identityTransform,
-		Vector3(1.0f),
-		Vector3(107,175,238) / 255.0f
+	spherePlane = std::make_shared<Sphere>(
+		spherePlaneTransform,
+		1.0f,
+		Vector3(240, 136, 83) / 255.0f
 		);
 
 	// Load Bunny Mesh
@@ -116,7 +123,7 @@ Scene::Scene()
 	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, bunny_list);
 
 	std::vector<IDistanceRef> entityList
-		= { sphere, bunnyMesh };
+		= { sphere, bunnyMesh , spherePlane };
 	IDistanceRef blendingEntity
 		= std::make_shared<MeshBlender>(entityList, 3.0f);
 
