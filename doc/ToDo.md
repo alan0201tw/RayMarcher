@@ -33,3 +33,5 @@
         * Use new position for normal evaluation : a point slightly out of the point on surface, referencing SebLague's RayMarching repo
 
     * Use Ray tracer to produce golden ( ground truth )
+
+    * Apply rule of five ( if the code becomes too spaghetti, perhaps cast some of the operator to delete? )
