@@ -35,3 +35,4 @@
     * Use Ray tracer to produce golden ( ground truth )
 
     * Apply rule of five ( if the code becomes too spaghetti, perhaps cast some of the operator to delete? )
+        * Consider using std::move with std::unique_ptr ?
