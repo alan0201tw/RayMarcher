@@ -14,9 +14,13 @@ public:
 
     ~Ray() {}
 
+	Ray(const Ray& other) = default;
+	Ray(Ray&& other) = default;
+	Ray& operator=(Ray const &) = default;
+	Ray& operator=(Ray &&) = default;
+
     inline Vector3 GetOrigin() const       { return m_origin; }
     inline Vector3 GetDirection() const    { return m_direction; }
-    inline Vector3 GetPointAtParameter(float t) const { return m_origin + t * m_direction; }
 
 private:
     Vector3 m_origin;

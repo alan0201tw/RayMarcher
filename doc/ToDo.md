@@ -36,3 +36,7 @@
 
     * Apply rule of five ( if the code becomes too spaghetti, perhaps cast some of the operator to delete? )
         * Consider using std::move with std::unique_ptr ?
+    
+    * Handle object edge by handling case when ray iteration exceeds MAX_ITER
+        * the return {0, 0, 0} case
+        * this should be replaced by the closest point info that still is over EPSILON

@@ -28,6 +28,13 @@ protected:
         : m_transform(transform)
           {};
     virtual ~Entity() {};
+
+	// Restrict copy constructor and assign operator
+
+	Entity(const Entity& other) = default;
+	Entity(Entity&& other) = default;
+	Entity& operator=(Entity const &) = default;
+	Entity& operator=(Entity &&) = default;
 };
 
 class Sphere final : public Entity
@@ -48,6 +55,11 @@ public:
     ~Sphere() {};
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+
+	Sphere(const Sphere& other) = default;
+	Sphere(Sphere&& other) = default;
+	Sphere& operator=(Sphere const &) = default;
+	Sphere& operator=(Sphere &&) = default;
 };
 
 class Cube final : public Entity
@@ -55,6 +67,7 @@ class Cube final : public Entity
 private:
     Vector3 m_extent;
     Vector3 m_color;
+
 public:
     explicit Cube(
 		Transform transform,
@@ -67,4 +80,9 @@ public:
     ~Cube() {};
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+
+	Cube(const Cube& other) = default;
+	Cube(Cube&& other) = default;
+	Cube& operator=(Cube const &) = default;
+	Cube& operator=(Cube &&) = default;
 };

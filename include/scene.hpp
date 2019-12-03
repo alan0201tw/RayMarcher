@@ -15,6 +15,11 @@ public:
 		{}
 	~IDistanceList() {}
 
+	IDistanceList(const IDistanceList& other) = default;
+	IDistanceList(IDistanceList&& other) = default;
+	IDistanceList& operator=(IDistanceList const &) = default;
+	IDistanceList& operator=(IDistanceList &&) = default;
+
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };
 
@@ -26,6 +31,12 @@ private:
 public:
 	explicit Scene();
 	~Scene() {}
+
+	// NonCopyable: Restrict copy constructor and assign operator
+	Scene(const Scene& other) = delete;
+	Scene(Scene&& other) = delete;
+	Scene& operator=(Scene const &) = delete;
+	Scene& operator=(Scene &&) = delete;
 
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 	virtual void Update(float currentTime) const final override;

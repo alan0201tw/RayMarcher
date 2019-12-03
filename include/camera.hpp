@@ -31,6 +31,11 @@ public:
     }
 
     ~Camera() {}
+
+	Camera(const Camera& other) = default;
+	Camera(Camera&& other) = default;
+	Camera& operator=(Camera const &) = default;
+	Camera& operator=(Camera &&) = default;
     
     inline Ray get_ray(float u, float v) const
     {

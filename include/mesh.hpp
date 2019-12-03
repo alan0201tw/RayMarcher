@@ -23,9 +23,9 @@ private:
 
 public:
 	explicit Triangle(
-		Transform transform,
-		std::array<Vector3, 3> vertices,
-		Vector3 color
+		const Transform& transform,
+		const std::array<Vector3, 3>& vertices,
+		const Vector3& color
 		)
 		: Entity(transform), m_vertices(vertices), m_color(color)
 		{
@@ -35,6 +35,11 @@ public:
 	~Triangle() {};
 
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+
+	Triangle(const Triangle& other) = default;
+	Triangle(Triangle&& other) = default;
+	Triangle& operator=(Triangle const &) = default;
+	Triangle& operator=(Triangle &&) = default;
 };
 
 class TriangleMesh final : public Entity
@@ -44,8 +49,8 @@ private:
 
 public:
 	explicit TriangleMesh(
-		Transform transform,
-		std::vector<Triangle> triangles
+		const Transform& transform,
+		const std::vector<Triangle>& triangles
 		)
 		: Entity(transform), m_triangles(triangles)
 		{}
@@ -53,4 +58,9 @@ public:
 	~TriangleMesh() {};
 
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+
+	TriangleMesh(const TriangleMesh& other) = default;
+	TriangleMesh(TriangleMesh&& other) = default;
+	TriangleMesh& operator=(TriangleMesh const &) = default;
+	TriangleMesh& operator=(TriangleMesh &&) = default;
 };

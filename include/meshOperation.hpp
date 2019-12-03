@@ -17,12 +17,17 @@ private:
 
 public:
     explicit MeshBlender(
-        std::vector<IDistanceRef> entities,
-        float k
+        const std::vector<IDistanceRef>& entities,
+        const float& k
         )
         : m_entities(entities), m_k(k) {}
 
     ~MeshBlender() {}
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+
+	MeshBlender(const MeshBlender& other) = default;
+	MeshBlender(MeshBlender&& other) = default;
+	MeshBlender& operator=(MeshBlender const &) = default;
+	MeshBlender& operator=(MeshBlender &&) = default;
 };
