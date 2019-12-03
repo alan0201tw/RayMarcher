@@ -154,13 +154,6 @@ Scene::Scene()
 
 Vector3 Scene::EvaluateNormal(Vector3 point, float time, float epsilon) const
 {
-	// TEST : test to check if this improves the lighting on triangle mesh - bunnyLow
-	// TEST Result : does not work
-	// epsilon *= 0.01f;
-
-	// TEST : this is even worse
-	//epsilon = std::numeric_limits<float>::epsilon();
-
 	const Vector3 eps_x = Vector3(epsilon, 0.0f, 0.0f);
 	const Vector3 eps_y = Vector3(0.0f, epsilon, 0.0f);
 	const Vector3 eps_z = Vector3(0.0f, 0.0f, epsilon);

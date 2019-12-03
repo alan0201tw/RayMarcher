@@ -15,7 +15,7 @@ DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 	const Vector3 nor = -m_normal;
 
 	DistanceInfo info;
-	// TEST : add std::abs to avoid culling, attempt to improve lighting quality
+
 	info.distance = std::sqrt(
 		(sign(dot(cross(ba, nor), pa)) + 
 		 sign(dot(cross(cb, nor), pb)) +
@@ -30,7 +30,6 @@ DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 
 	info.distance *= m_transform.scale;
 
-	// TMP
 	info.color = m_color;
 
 	return info;
