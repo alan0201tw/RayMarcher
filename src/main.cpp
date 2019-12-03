@@ -94,8 +94,8 @@ rgb01 GetColor(float u, float v, float currentTime)
         auto info = scene.GetDistanceInfo(pos, currentTime); // Evalulate the distance at the current point
 
 		// TEST : attempt to add outline, this works, kind of (?)
-		if ( i >= 90 )
-			return { 1, 1, 1 };
+		// if ( i >= 90 )
+		// 	return { 1, 1, 1 };
 
         dist = info.distance;
 

@@ -1,8 +1,4 @@
 * NSD_RayMarcher
-    * Continue implementation
-
-    * Some more primitives
-
     * (O) Lighting (Phong or Blinn Phong, entity contain material, material contain texture)
     * (O) Transform (Translate and Rotation, mimic Ray tracer)
     * (?) Precompiled Header - on stb_image and thread_pool ?
@@ -28,10 +24,12 @@
     * BVH or Parallel triangle SDF in triangle mesh
         * Current performance is way too poor
         * One image needs a few seconds?
-        * Triangle lighting quality is poor, maybe lower epsilon for evaluating normal?
+        * (Moved to bottom) Triangle lighting quality is poor, maybe lower epsilon for evaluating normal?
 
     * (O) Transform : Use transpost for inversing rotation
 
     * (O) Improve lighting quality
         * Try sphere marching? -> compute every distance and use as ray march step size
         * Use new position for normal evaluation : a point slightly out of the point on surface, referencing SebLague's RayMarching repo
+
+    * Use Ray tracer to produce golden ( ground truth )

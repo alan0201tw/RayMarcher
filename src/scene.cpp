@@ -14,6 +14,22 @@ namespace
 	std::shared_ptr<Entity> bunnyMesh;
 }
 
+DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
+{
+	DistanceInfo info;
+	info.distance = 1e9f;
+	for(auto& id : m_idistList)
+	{
+		auto currentInfo = id->GetDistanceInfo(point, time);
+		if(currentInfo.distance < info.distance)
+		{
+			info = currentInfo;
+		}
+	}
+
+	return info;
+}
+
 DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
 {
     // TODO : modify to use BVH for speed up
@@ -114,7 +130,9 @@ Scene::Scene()
 				vertices[v] = Vector3(vx, vy, vz);
 			}
 
-			bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
+			// Use emplace_back to reduce the amount of instantiation
+			// bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
+			bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
 
 			index_offset += fv;
 		}
@@ -122,13 +140,16 @@ Scene::Scene()
 
 	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, bunny_list);
 
-	std::vector<IDistanceRef> entityList
-		= { sphere, bunnyMesh , spherePlane };
+	std::vector<IDistanceRef> blendingEntityList
+		= { sphere, bunnyMesh };
 	IDistanceRef blendingEntity
-		= std::make_shared<MeshBlender>(entityList, 3.0f);
+		= std::make_shared<MeshBlender>(blendingEntityList, 3.0f);
 
-    m_distanceFuncProvider = blendingEntity;
+    // m_distanceFuncProvider = blendingEntity;
 	//m_distanceFuncProvider = bunnyMesh;
+	std::vector<IDistanceRef> sceneList
+		= { blendingEntity, spherePlane };
+	m_distanceFuncProvider = std::make_shared<IDistanceList>(sceneList);
 }
 
 Vector3 Scene::EvaluateNormal(Vector3 point, float time, float epsilon) const
