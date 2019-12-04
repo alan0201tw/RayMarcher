@@ -10,24 +10,25 @@
 namespace
 {
 	std::shared_ptr<Entity> sphere;
-	std::shared_ptr<Entity> spherePlane;
+	std::shared_ptr<Entity> plane0, plane1;
 	std::shared_ptr<Entity> bunnyMesh;
 }
 
 DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
 {
-	DistanceInfo info;
-	info.distance = 1e9f;
-	for(auto& id : m_idistList)
-	{
-		auto currentInfo = id->GetDistanceInfo(point, time);
-		if(currentInfo.distance < info.distance)
-		{
-			info = currentInfo;
-		}
-	}
+	if(m_idistList.empty())
+    {
+        throw std::runtime_error("Empty IDistanceList!");
+    }
 
-	return info;
+    DistanceInfo currentInfo = m_idistList[0]->GetDistanceInfo(point, time);
+    for(size_t i = 1; i < m_idistList.size(); ++i)
+    {
+		auto tmp = m_idistList[i]->GetDistanceInfo(point, time);
+		if(tmp.distance < currentInfo.distance)
+        	currentInfo = tmp;
+    }
+    return currentInfo;
 }
 
 DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
@@ -63,11 +64,19 @@ Scene::Scene()
 		5.0f
 	};
 
-	const Transform spherePlaneTransform = 
+	const Transform plane0Transform = 
 	{
-		Vector3(0.0f, -255.0f, 0.0f),
+		Vector3(0.0f, -3.0f, 0.0f),
 		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
-		250.0f
+		100.0f
+	};
+	
+	// So basically I use two planes to cover the edge visual artifact
+	const Transform plane1Transform =
+	{
+		Vector3(0.0f, 0.0f, -30.0f),
+		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
+		100.0f
 	};
 
 	const Transform identityTransform =
@@ -83,11 +92,25 @@ Scene::Scene()
 		Vector3(173, 245, 255) / 255.0f
 		);
 
-	spherePlane = std::make_shared<Sphere>(
-		spherePlaneTransform,
-		1.0f,
+	// Using a large sphere as plane in a distance based renderer might not be
+	// a good idea
+
+	// plane = std::make_shared<Sphere>(
+	// 	spherePlaneTransform,
+	// 	1.0f,
+	// 	Vector3(240, 136, 83) / 255.0f
+	// 	);
+	plane0 = std::make_shared<Cube>(
+		plane0Transform,
+		Vector3(1.0f, 0.01f, 1.0f),
 		Vector3(240, 136, 83) / 255.0f
-		);
+	);
+
+	plane1 = std::make_shared<Cube>(
+		plane1Transform,
+		Vector3(1.0f, 1.0f, 0.1f),
+		Vector3(83, 136, 240) / 255.0f
+	);
 
 	// Load Bunny Mesh
 	tinyobj::attrib_t attrib;
@@ -148,7 +171,7 @@ Scene::Scene()
     // m_distanceFuncProvider = blendingEntity;
 	//m_distanceFuncProvider = bunnyMesh;
 	std::vector<IDistanceRef> sceneList
-		= { blendingEntity, spherePlane };
+		= { blendingEntity, plane0, plane1 };
 	m_distanceFuncProvider = std::make_shared<IDistanceList>(sceneList);
 }
 

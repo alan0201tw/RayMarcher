@@ -68,15 +68,15 @@ void write_to_image(size_t u, size_t v, rgb01 value)
 rgb01 GetColor(float u, float v, float currentTime)
 {
     static Camera camera(
-        Vector3(3.0f, 3.0f, 10.0f),
-        Vector3(0.0f, 0.0f, -1.0f),
+        Vector3(0.0f, 3.0f, 10.0f),
+        Vector3(0.0f, 0.0f, 0.0f),
         Vector3(0.0f, 1.0f, 0.0f),
         60.0f,
         width_to_height_ratio
     );
 
     const int MAX_ITER = 100; // 100 is a safe number to use, it won't produce too many artifacts and still be quite fast
-    const float MAX_DIST = 200.0f; // Make sure you change this if you have objects farther than 20 units away from the camera
+    const float MAX_DIST = 2000.0f; // Make sure you change this if you have objects farther than 20 units away from the camera
     const float EPSILON = 0.001f; // At this distance we are close enough to the object that we have essentially hit it
 
     Ray ray = camera.get_ray(u, v);
@@ -99,7 +99,8 @@ rgb01 GetColor(float u, float v, float currentTime)
 
         dist = info.distance;
 
-        if(dist <= EPSILON)
+        // TEST : attempt to fix object edge use the same technique as outline
+        if(dist < EPSILON)
         {
             // Reference : https://github.com/SebLague/Ray-Marching/blob/master/Assets/Scripts/SDF/Raymarching.compute#L223
             // Use the point slightly away from surface to evaluate normal

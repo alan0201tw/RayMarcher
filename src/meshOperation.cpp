@@ -39,7 +39,7 @@ DistanceInfo MeshBlender::GetDistanceInfo(Vector3 point, float time) const
     }
 
     DistanceInfo currentInfo = m_entities[0]->GetDistanceInfo(point, time);
-    for(size_t i = 0; i < m_entities.size(); ++i)
+    for(size_t i = 1; i < m_entities.size(); ++i)
     {
         currentInfo = SmoothDistance(
             currentInfo,
