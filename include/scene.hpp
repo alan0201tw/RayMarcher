@@ -10,8 +10,11 @@ private:
 	std::vector< IDistanceRef > m_idistList;
 
 public:
-	explicit IDistanceList(std::vector< IDistanceRef > elements)
+	explicit IDistanceList(const std::vector< IDistanceRef >& elements)
 		: m_idistList(elements)
+		{}
+	explicit IDistanceList(std::vector< IDistanceRef >&& elements)
+		: m_idistList(std::move(elements))
 		{}
 	~IDistanceList() {}
 

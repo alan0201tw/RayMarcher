@@ -57,7 +57,7 @@ project "RayMarcher"
             "_USE_MATH_DEFINES"
         }
 
-    filter  "configurations:Debug"
+    filter { "configurations:Debug" }
         symbols "On"
     
     filter { "configurations:Release" }

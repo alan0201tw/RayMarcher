@@ -55,6 +55,13 @@ public:
 		: Entity(transform), m_triangles(triangles)
 		{}
 
+	explicit TriangleMesh(
+		const Transform& transform,
+		std::vector<Triangle>&& triangles
+	)
+		: Entity(transform), m_triangles(std::move(triangles))
+	{}
+
 	~TriangleMesh() {};
 
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;

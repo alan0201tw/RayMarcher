@@ -22,6 +22,12 @@ public:
         )
         : m_entities(entities), m_k(k) {}
 
+	explicit MeshBlender(
+		std::vector<IDistanceRef>&& entities,
+		const float& k
+	)
+		: m_entities(std::move(entities)), m_k(k) {}
+
     ~MeshBlender() {}
 
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;

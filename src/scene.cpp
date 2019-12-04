@@ -7,6 +7,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
+#include <ctime>
+
 namespace
 {
 	std::shared_ptr<Entity> sphere;
@@ -39,17 +41,21 @@ DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
 
 void Scene::Update(float currentTime) const
 {
-	sphere->position() = Vector3(8.0f * (0.5f - currentTime));
+	if (sphere)
+		sphere->position() = Vector3(8.0f * (0.5f - currentTime));
 
-	bunnyMesh->orientation() = Matrix3x3(
-		{ std::cos(currentTime * 5.0f), 0, std::sin(currentTime * 5.0f) },
-		{ 0, 1, 0 },
-		{-std::sin(currentTime * 5.0f), 0, std::cos(currentTime * 5.0f) }
+	if (bunnyMesh)
+		bunnyMesh->orientation() = Matrix3x3(
+			{ std::cos(currentTime * 5.0f), 0, std::sin(currentTime * 5.0f) },
+			{ 0, 1, 0 },
+			{ -std::sin(currentTime * 5.0f), 0, std::cos(currentTime * 5.0f) }
 	);
 }
 
 Scene::Scene()
 {
+	clock_t start = clock();
+
     const Transform sphereTransform =
 	{
 		Vector3(2.5f),
@@ -161,6 +167,35 @@ Scene::Scene()
 		}
 	}
 
+	// Update : The house-keeping code here does not cost a lot of time, and the difference
+	// between copy and move constructor is little.
+	//
+	// Reference : https://stackoverflow.com/questions/40193269/does-the-use-of-stdmove-have-any-performance-benefits
+	// This post states that the preformance gain from move constructor is from dynamic allocation being ruled out.
+	// Since I do not reduce the amount of dynamic allocation here ( all the objects are created in advance ),
+	// There should be no performance gain
+
+#if 0
+
+	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
+
+	std::vector<IDistanceRef> blendingEntityList
+		= { sphere, bunnyMesh };
+	IDistanceRef blendingEntity
+		= std::make_shared<MeshBlender>(std::move(blendingEntityList), 3.0f);
+
+	blendingEntityList.push_back(sphere);
+
+	std::vector<IDistanceRef> sceneList
+		= { blendingEntity, plane0, plane1 };
+	m_distanceFuncProvider = std::make_shared<IDistanceList>(std::move(sceneList));
+
+	clock_t end = clock();
+	double time = (double)(end - start) / CLOCKS_PER_SEC * 1000.0;
+	std::cout << "House-Keeping time for MOVE_CSTR is " << time << " ms" << std::endl;
+
+#else
+
 	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, bunny_list);
 
 	std::vector<IDistanceRef> blendingEntityList
@@ -168,11 +203,15 @@ Scene::Scene()
 	IDistanceRef blendingEntity
 		= std::make_shared<MeshBlender>(blendingEntityList, 3.0f);
 
-    // m_distanceFuncProvider = blendingEntity;
-	//m_distanceFuncProvider = bunnyMesh;
 	std::vector<IDistanceRef> sceneList
 		= { blendingEntity, plane0, plane1 };
 	m_distanceFuncProvider = std::make_shared<IDistanceList>(sceneList);
+
+	clock_t end = clock();
+	double time = (double)(end - start) / CLOCKS_PER_SEC * 1000.0;
+	std::cout << "House-Keeping time for COPY_CSTR is " << time << " ms" << std::endl;
+
+#endif // MOVE_CSTR
 }
 
 Vector3 Scene::EvaluateNormal(Vector3 point, float time, float epsilon) const
