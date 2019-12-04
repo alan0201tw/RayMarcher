@@ -3,11 +3,8 @@
 #include <iostream>
 
 #include "mesh.hpp"
-
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
-
-#include <ctime>
 
 namespace
 {
@@ -54,8 +51,6 @@ void Scene::Update(float currentTime) const
 
 Scene::Scene()
 {
-	clock_t start = clock();
-
     const Transform sphereTransform =
 	{
 		Vector3(2.5f),
@@ -172,10 +167,20 @@ Scene::Scene()
 	//
 	// Reference : https://stackoverflow.com/questions/40193269/does-the-use-of-stdmove-have-any-performance-benefits
 	// This post states that the preformance gain from move constructor is from dynamic allocation being ruled out.
-	// Since I do not reduce the amount of dynamic allocation here ( all the objects are created in advance ),
-	// There should be no performance gain
+	//
+	// Update : Remove incorrect comments. Use move semantics to construct std::vector does yield performance gain.
+	// However, it needs about 1e7 integer elements to actually sees the difference.
+	// 
+	// using the "bunnyLow" mesh, which has 135 triangles. And duplicate the emplace_back process by 1e5
+	//
+	// for(int i=0;i<1e5;++i)
+	//     bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f);
+	//
+	// this yields a significant performance difference. About 0~1 ms for move and 600~700 ms for copy
 
-#if 0
+#if 1
+
+	std::cout << "Using move constructor" << std::endl;
 
 	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
 
@@ -190,11 +195,9 @@ Scene::Scene()
 		= { blendingEntity, plane0, plane1 };
 	m_distanceFuncProvider = std::make_shared<IDistanceList>(std::move(sceneList));
 
-	clock_t end = clock();
-	double time = (double)(end - start) / CLOCKS_PER_SEC * 1000.0;
-	std::cout << "House-Keeping time for MOVE_CSTR is " << time << " ms" << std::endl;
-
 #else
+
+	std::cout << "Using copy constructor" << std::endl;
 
 	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, bunny_list);
 
@@ -207,11 +210,7 @@ Scene::Scene()
 		= { blendingEntity, plane0, plane1 };
 	m_distanceFuncProvider = std::make_shared<IDistanceList>(sceneList);
 
-	clock_t end = clock();
-	double time = (double)(end - start) / CLOCKS_PER_SEC * 1000.0;
-	std::cout << "House-Keeping time for COPY_CSTR is " << time << " ms" << std::endl;
-
-#endif // MOVE_CSTR
+#endif
 }
 
 Vector3 Scene::EvaluateNormal(Vector3 point, float time, float epsilon) const
