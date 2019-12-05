@@ -11,6 +11,8 @@ namespace
 	std::shared_ptr<Entity> sphere;
 	std::shared_ptr<Entity> plane0, plane1;
 	std::shared_ptr<Entity> bunnyMesh;
+
+	const float M_PI_MUL2 = 2.0f * static_cast<float>(M_PI);
 }
 
 DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
@@ -43,10 +45,10 @@ void Scene::Update(float currentTime) const
 
 	if (bunnyMesh)
 		bunnyMesh->orientation() = Matrix3x3(
-			{ std::cos(currentTime * 5.0f), 0, std::sin(currentTime * 5.0f) },
+			{ std::cos(currentTime * M_PI_MUL2), 0, std::sin(currentTime * M_PI_MUL2) },
 			{ 0, 1, 0 },
-			{ -std::sin(currentTime * 5.0f), 0, std::cos(currentTime * 5.0f) }
-	);
+			{ -std::sin(currentTime * M_PI_MUL2), 0, std::cos(currentTime * M_PI_MUL2) }
+		);
 }
 
 Scene::Scene()
