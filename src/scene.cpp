@@ -90,7 +90,7 @@ Scene::Scene()
 	sphere = std::make_shared<Sphere>(
 		sphereTransform, 
 		1.0f,
-		Vector3(173, 245, 255) / 255.0f
+		Vector3(36,144,135) / 255.0f
 		);
 
 	// Using a large sphere as plane in a distance based renderer might not be

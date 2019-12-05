@@ -104,3 +104,56 @@ int main()
     }
 }
 ```
+
+* Designing interface for BVH
+    * BVH needs to work with Transform, this is kind of tedious
+    * Each GetBoundingBox method in a Entity:IDistance needs to take its Transform into consider
+    * Rotate : iterate every combination of rotated x,y,z ,then find the minimum and maximum
+
+```cpp
+
+// IDistance needs to extend to contain a BoundingBox method to return a AABB
+
+class AABB final
+{
+    Vector3 GetMin() const;
+    Vector3 GetMax() const;
+
+    // virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+
+    // do not inherit from IDistance
+    // simply use a distance function
+    float GetDistance(Vector3 point) const;
+
+    static AABB MergeAABB(const AABB& a, const AABB& b);
+};
+
+class BVH : public IDistance
+{
+private:
+    class box_x_compare
+    {
+    public:
+        bool operator()(const hitable_reference& a, const hitable_reference& b) const;
+    };
+    class box_y_compare
+    {
+    public:
+        bool operator()(const hitable_reference& a, const hitable_reference& b) const;
+    };
+    class box_z_compare
+    {
+    public:
+        bool operator()(const hitable_reference& a, const hitable_reference& b) const;
+    };
+
+public:
+    BVH(const vector<IDistanceRef>& elements);
+    BVH(vector<IDistanceRef>&& elements);
+
+    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+
+    IDistanceRef left, right;
+    AABB box;
+};
+```
