@@ -4,6 +4,8 @@
 
 #include "vec_math.hpp"
 
+struct AABB;
+
 struct DistanceInfo
 {
     float distance;
@@ -14,6 +16,9 @@ class IDistance
 {
 public:
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const = 0;
+
+    // this is for BVH
+    virtual AABB GetBoundingBox() const = 0;
 };
 
 class IUpdate

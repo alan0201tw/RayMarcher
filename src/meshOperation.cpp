@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include "bvh.hpp"
+
 DistanceInfo MeshBlender::SmoothDistance(
     DistanceInfo info0, 
     DistanceInfo info1, 
@@ -29,6 +31,19 @@ DistanceInfo MeshBlender::SmoothDistance(
         col1 * std::abs(r0);
 
     return info;
+}
+
+AABB MeshBlender::GetBoundingBox() const
+{
+    AABB box = m_entities[0]->GetBoundingBox();
+    for(size_t i = 1; i < m_entities.size(); ++i)
+    {
+        box = AABB::MergeAABB(
+            box,
+            m_entities[i]->GetBoundingBox()
+            );
+    }
+    return box;
 }
 
 DistanceInfo MeshBlender::GetDistanceInfo(Vector3 point, float time) const

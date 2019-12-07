@@ -34,6 +34,7 @@ public:
 
 	~Triangle() {};
 
+	virtual AABB GetBoundingBox() const final override;
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
 	Triangle(const Triangle& other) = default;
@@ -42,32 +43,35 @@ public:
 	Triangle& operator=(Triangle &&) = default;
 };
 
-class TriangleMesh final : public Entity
-{
-private:
-	std::vector<Triangle> m_triangles;
+// class TriangleMesh final : public Entity
+// {
+// private:
+// 	// TODO : change to BVH 
+// 	//std::vector<Triangle> m_triangles;
+	
 
-public:
-	explicit TriangleMesh(
-		const Transform& transform,
-		const std::vector<Triangle>& triangles
-		)
-		: Entity(transform), m_triangles(triangles)
-		{}
+// public:
+// 	explicit TriangleMesh(
+// 		const Transform& transform,
+// 		const std::vector<Triangle>& triangles
+// 		)
+// 		: Entity(transform), m_triangles(triangles)
+// 		{}
 
-	explicit TriangleMesh(
-		const Transform& transform,
-		std::vector<Triangle>&& triangles
-	)
-		: Entity(transform), m_triangles(std::move(triangles))
-	{}
+// 	explicit TriangleMesh(
+// 		const Transform& transform,
+// 		std::vector<Triangle>&& triangles
+// 	)
+// 		: Entity(transform), m_triangles(std::move(triangles))
+// 	{}
 
-	~TriangleMesh() {};
+// 	~TriangleMesh() {};
 
-	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
+// 	virtual AABB GetBoundingBox() const final override;
+// 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
-	TriangleMesh(const TriangleMesh& other) = default;
-	TriangleMesh(TriangleMesh&& other) = default;
-	TriangleMesh& operator=(TriangleMesh const &) = default;
-	TriangleMesh& operator=(TriangleMesh &&) = default;
-};
+// 	TriangleMesh(const TriangleMesh& other) = default;
+// 	TriangleMesh(TriangleMesh&& other) = default;
+// 	TriangleMesh& operator=(TriangleMesh const &) = default;
+// 	TriangleMesh& operator=(TriangleMesh &&) = default;
+// };

@@ -3,6 +3,8 @@
 #include <iostream>
 
 #include "mesh.hpp"
+#include "bvh.hpp"
+
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
 
@@ -13,6 +15,19 @@ namespace
 	std::shared_ptr<Entity> bunnyMesh;
 
 	const float M_PI_MUL2 = 2.0f * static_cast<float>(M_PI);
+}
+
+AABB IDistanceList::GetBoundingBox() const
+{
+    AABB box = m_idistList[0]->GetBoundingBox();
+    for(size_t i = 1; i < m_idistList.size(); ++i)
+    {
+        box = AABB::MergeAABB(
+            box,
+            m_idistList[i]->GetBoundingBox()
+            );
+    }
+    return box;
 }
 
 DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
@@ -30,6 +45,12 @@ DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
         	currentInfo = tmp;
     }
     return currentInfo;
+}
+
+AABB Scene::GetBoundingBox() const
+{
+	// scene acts as the root of BVH tree, this should never be called
+	return AABB( Vector3(-1e9), Vector3(1e9) );
 }
 
 DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
@@ -132,7 +153,8 @@ Scene::Scene()
 		std::cerr << err << std::endl;
 	}
 
-	std::vector<Triangle> bunny_list;
+	// std::vector<Triangle> bunny_list;
+	std::vector<IDistanceRef> bunny_list;
 	bunny_list.reserve(shapes.size());
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++)
@@ -158,7 +180,10 @@ Scene::Scene()
 
 			// Use emplace_back to reduce the amount of instantiation
 			// bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
-			bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+			// bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+			bunny_list.push_back(
+				std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+			);
 
 			index_offset += fv;
 		}
@@ -184,7 +209,8 @@ Scene::Scene()
 
 	std::cout << "Using move constructor" << std::endl;
 
-	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
+	// bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
+	bunnyMesh = std::make_shared<BVH>(bunnyTransform, std::move(bunny_list));
 
 	std::vector<IDistanceRef> blendingEntityList
 		= { sphere, bunnyMesh };

@@ -1,5 +1,15 @@
 #include "entity.hpp"
 
+#include "bvh.hpp"
+
+AABB Sphere::GetBoundingBox() const
+{
+    Vector3 radiusVector(m_radius, m_radius, m_radius);
+
+    return AABB( m_transform.position - radiusVector, 
+        m_transform.position + radiusVector );
+}
+
 DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
 {
 	const Vector3 pos = ApplyInverseTransform(m_transform, point);
@@ -10,6 +20,14 @@ DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
 	info.distance *= m_transform.scale;
 
     return info;
+}
+
+AABB Cube::GetBoundingBox() const
+{
+    Vector3 halfExtent(m_extent * 0.5f);
+
+    return AABB( m_transform.position - halfExtent, 
+        m_transform.position + halfExtent );
 }
 
 DistanceInfo Cube::GetDistanceInfo(Vector3 point, float time) const

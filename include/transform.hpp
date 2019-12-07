@@ -13,6 +13,13 @@ struct Transform
 	float scale;
 };
 
+const Transform identityTransform = 
+{
+    Vector3(0.0f),
+    Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
+    1.0f
+};
+
 Vector3 ApplyInverseTransform(Transform transform, Vector3 point);
 
 Vector3 safe_normalize(Vector3 a);

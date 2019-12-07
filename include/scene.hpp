@@ -23,6 +23,7 @@ public:
 	IDistanceList& operator=(IDistanceList const &) = default;
 	IDistanceList& operator=(IDistanceList &&) = default;
 
+ 	virtual AABB GetBoundingBox() const final override;
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };
 
@@ -41,6 +42,7 @@ public:
 	Scene& operator=(Scene const &) = delete;
 	Scene& operator=(Scene &&) = delete;
 
+	virtual AABB GetBoundingBox() const final override;
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 	virtual void Update(float currentTime) const final override;
 

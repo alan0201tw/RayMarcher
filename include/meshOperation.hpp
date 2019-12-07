@@ -30,6 +30,7 @@ public:
 
     ~MeshBlender() {}
 
+    virtual AABB GetBoundingBox() const final override;
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
 	MeshBlender(const MeshBlender& other) = default;
