@@ -83,9 +83,9 @@ Scene::Scene()
 
 	const Transform bunnyTransform =
 	{
-		Vector3(0.0f),
+		Vector3(1.0f, -2.0f, 0.0f),
 		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
-		5.0f
+		35.0f
 	};
 
 	const Transform plane0Transform = 
@@ -136,7 +136,7 @@ Scene::Scene()
 	std::string warn;
 	std::string err;
 
-	tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, "./resources/bunnyLow.obj");
+	tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, "./resources/bunny.obj");
 	if (!warn.empty())
 	{
 		std::cout << warn << std::endl;
