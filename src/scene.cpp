@@ -146,8 +146,8 @@ Scene::Scene()
 		std::cerr << err << std::endl;
 	}
 
-	// std::vector<Triangle> bunny_list;
-	std::vector<IDistanceRef> bunny_list;
+	std::vector<Triangle> bunny_list;
+	//std::vector<IDistanceRef> bunny_list;
 	bunny_list.reserve(shapes.size());
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++)
@@ -173,10 +173,10 @@ Scene::Scene()
 
 			// Use emplace_back to reduce the amount of instantiation
 			// bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
-			// bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
-			bunny_list.push_back(
-				std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
-			);
+			bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+			//bunny_list.push_back(
+			//	std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+			//);
 
 			index_offset += fv;
 		}
@@ -202,9 +202,9 @@ Scene::Scene()
 
 	std::cout << "Using move constructor" << std::endl;
 
-	// bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
+	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
 	// bunnyMesh = std::make_shared<BVH>(bunnyTransform, std::move(bunny_list));
-	bunnyMesh = std::make_shared<TransformedBVH>(bunnyTransform, std::move(bunny_list));
+	//bunnyMesh = std::make_shared<TransformedBVH>(bunnyTransform, std::move(bunny_list));
 
 	std::vector<IDistanceRef> blendingEntityList
 		= { sphere, bunnyMesh };

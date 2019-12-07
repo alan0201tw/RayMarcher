@@ -57,28 +57,36 @@ DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 	return info;
 }
 
-// AABB TriangleMesh::GetBoundingBox() const
-// {
+ AABB TriangleMesh::GetBoundingBox() const
+ {
+	 AABB box = m_triangles[0].GetBoundingBox();
+	 for (size_t i = 1; i < m_triangles.size(); ++i)
+	 {
+		 box = AABB::MergeAABB(
+			 box,
+			 m_triangles[i].GetBoundingBox()
+		 );
+	 }
+	 return box;
+ }
 
-// }
+ DistanceInfo TriangleMesh::GetDistanceInfo(Vector3 point, float time) const
+ {
+ 	const Vector3 pos = ApplyInverseTransform(m_transform, point);
 
-// DistanceInfo TriangleMesh::GetDistanceInfo(Vector3 point, float time) const
-// {
-// 	const Vector3 pos = ApplyInverseTransform(m_transform, point);
+ 	DistanceInfo info;
+ 	info.distance = 1e9;
 
-// 	DistanceInfo info;
-// 	info.distance = 1e9;
+ 	for (auto& tri : m_triangles)
+ 	{
+ 		auto currentInfo = tri.GetDistanceInfo(pos, time);
+ 		if (currentInfo.distance < info.distance)
+ 		{
+ 			info = currentInfo;
+ 		}
+ 	}
 
-// 	for (auto& tri : m_triangles)
-// 	{
-// 		auto currentInfo = tri.GetDistanceInfo(pos, time);
-// 		if (currentInfo.distance < info.distance)
-// 		{
-// 			info = currentInfo;
-// 		}
-// 	}
+ 	info.distance *= m_transform.scale;
 
-// 	info.distance *= m_transform.scale;
-
-// 	return info;
-// }
+ 	return info;
+ }

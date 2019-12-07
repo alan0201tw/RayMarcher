@@ -24,22 +24,37 @@
     * Current performance is way too poor
     * One image needs a few seconds?
     * (Moved to bottom) Triangle lighting quality is poor, maybe lower epsilon for evaluating normal?
-    * Current scene without BVH
+    
+    * BVH has to be constructed every frame 
+        * since it depends on transform, which updates every frame
+    * Each entity type has to consider its own transform in its GetBoundingBox method
+        * currently only consider position
+
+    * bunnyLow.obj without BVH
     ```
     real	82m4.230s
     user	271m59.557s
     sys	    0m35.908s
     ```
-    * BVH has to be constructed every frame 
-        * since it depends on transform, which updates every frame
-    * Each entity type has to consider its own transform in its GetBoundingBox method
-        * currently only consider position
-    * With BVH
+    * bunnyLow.obj With BVH
     ```
     real    95m13.382s
     user    312m0.187s
     sys     0m36.864s
     ```
+    * bunny.obj with BVH ( WSL ubuntu )
+    ```
+    real    20m55.495s
+    user    0m0.000s
+    sys     0m0.000s
+    ```
+    * bunny.obj without BVH
+    ```
+    real    14m16.287s
+    user    0m0.000s
+    sys     0m0.000s 
+    ```
+
 
 * (O) Transform : Use transpost for inversing rotation
 
