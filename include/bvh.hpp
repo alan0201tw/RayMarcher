@@ -26,16 +26,18 @@ public:
     static AABB MergeAABB(const AABB& a, const AABB& b);
 };
 
-class BVH final : public Entity
+class BVH : public IDistance
 {
-private:
+protected:
     std::vector<IDistanceRef> m_elements;
     IDistanceRef m_leftBVH, m_rightBVH;
     AABB m_boundingBox;
 
 public:
-    BVH(const Transform& transform, const std::vector<IDistanceRef>& elements);
-    BVH(const Transform& transform, std::vector<IDistanceRef>&& elements);
+    BVH(const std::vector<IDistanceRef>& elements);
+    BVH(std::vector<IDistanceRef>&& elements);
+
+    virtual ~BVH() {};
 
     virtual AABB GetBoundingBox() const final override;
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
@@ -57,4 +59,31 @@ private:
     public:
         bool operator()(const IDistanceRef& a, const IDistanceRef& b) const;
     };
+};
+
+class TransformedBVH final : public Entity
+{
+private:
+    BVH m_bvh;
+
+public:
+
+    TransformedBVH(
+        const Transform& transform,
+        const std::vector<IDistanceRef>& elements
+        )
+        : Entity(transform), m_bvh(elements)
+        {}
+
+    TransformedBVH(
+        const Transform& transform,
+        std::vector<IDistanceRef>&& elements
+        )
+        : Entity(transform), m_bvh(std::move(elements))
+        {}
+
+    ~TransformedBVH() {}
+
+    virtual AABB GetBoundingBox() const final override;
+    virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };

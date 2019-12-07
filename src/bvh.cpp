@@ -61,8 +61,8 @@ bool BVH::box_z_compare::operator()(const IDistanceRef& a, const IDistanceRef& b
         return true;
 }
 
-BVH::BVH(const Transform& transform, const std::vector<IDistanceRef>& elements)
-    : Entity(transform), m_elements(elements)
+BVH::BVH(const std::vector<IDistanceRef>& elements)
+    : m_elements(elements)
 {
     size_t random_axis = rand() % 3;
     if(random_axis == 0)
@@ -90,8 +90,8 @@ BVH::BVH(const Transform& transform, const std::vector<IDistanceRef>& elements)
         std::vector<IDistanceRef> right_list(
             m_elements.begin() + half_size, m_elements.end());
 
-        m_leftBVH = std::make_shared<BVH>(identityTransform, std::move(left_list));
-        m_rightBVH = std::make_shared<BVH>(identityTransform, std::move(right_list));
+        m_leftBVH = std::make_shared<BVH>(std::move(left_list));
+        m_rightBVH = std::make_shared<BVH>(std::move(right_list));
     }
 
     m_boundingBox = AABB::MergeAABB(
@@ -100,8 +100,8 @@ BVH::BVH(const Transform& transform, const std::vector<IDistanceRef>& elements)
     );
 }
 
-BVH::BVH(const Transform& transform, std::vector<IDistanceRef>&& elements)
-    : Entity(transform), m_elements(std::move(elements))
+BVH::BVH(std::vector<IDistanceRef>&& elements)
+    : m_elements(std::move(elements))
 {
     size_t random_axis = rand() % 3;
     if(random_axis == 0)
@@ -129,8 +129,8 @@ BVH::BVH(const Transform& transform, std::vector<IDistanceRef>&& elements)
         std::vector<IDistanceRef> right_list(
             m_elements.begin() + half_size, m_elements.end());
 
-        m_leftBVH = std::make_shared<BVH>(identityTransform, std::move(left_list));
-        m_rightBVH = std::make_shared<BVH>(identityTransform, std::move(right_list));
+        m_leftBVH = std::make_shared<BVH>(std::move(left_list));
+        m_rightBVH = std::make_shared<BVH>(std::move(right_list));
     }
 
     m_boundingBox = AABB::MergeAABB(
@@ -141,7 +141,7 @@ BVH::BVH(const Transform& transform, std::vector<IDistanceRef>&& elements)
 
 DistanceInfo BVH::GetDistanceInfo(Vector3 point, float time) const
 {
-    const Vector3 pos = ApplyInverseTransform(m_transform, point);
+    const Vector3 pos = point;
 
     DistanceInfo leftInfo = m_leftBVH->GetDistanceInfo(pos, time);
     DistanceInfo rightInfo = m_rightBVH->GetDistanceInfo(pos, time);
@@ -156,4 +156,51 @@ DistanceInfo BVH::GetDistanceInfo(Vector3 point, float time) const
 AABB BVH::GetBoundingBox() const
 {
     return m_boundingBox;
+}
+
+AABB TransformedBVH::GetBoundingBox() const
+{
+    Vector3 minimal(1e9, 1e9, 1e9);
+    Vector3 maximal(-1e9, -1e9, -1e9);
+
+    const AABB boundingBox = m_bvh.GetBoundingBox();
+
+    for(int i = 0; i < 2; i++)
+    {
+        for(int j = 0; j < 2; j++)
+        {
+            for(int k = 0; k < 2; k++)
+            {
+                float x = i * boundingBox.GetMax().x
+                    + (1 - i) * boundingBox.GetMin().x;
+                float y = j * boundingBox.GetMax().y     
+                    + (1 - j) * boundingBox.GetMin().y;
+                float z = k * boundingBox.GetMax().z
+                    + (1 - k) * boundingBox.GetMin().z;
+
+                Vector3 tester(x, y, z);
+                tester = ApplyTransform(m_transform, tester);
+                for(int c = 0; c < 3; c++)
+                {
+                    if(tester[c] > maximal[c])
+                        maximal[c] = tester[c];
+                    if(tester[c] < minimal[c])
+                        minimal[c] = tester[c];
+                }
+            }
+        }
+    }
+
+    return AABB(minimal, maximal);
+}
+
+DistanceInfo TransformedBVH::GetDistanceInfo(Vector3 point, float time) const
+{
+    Vector3 pos = ApplyInverseTransform(m_transform, point);
+    DistanceInfo info = m_bvh.GetDistanceInfo(pos, time);
+    // do inverse transform on distance,
+    // a scalar needs only scaling
+    info.distance *= m_transform.scale;
+
+    return info;
 }

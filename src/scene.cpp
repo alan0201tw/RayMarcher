@@ -103,13 +103,6 @@ Scene::Scene()
 		100.0f
 	};
 
-	const Transform identityTransform =
-	{
-		Vector3(0.0f),
-		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
-		1.0f
-	};
-
 	sphere = std::make_shared<Sphere>(
 		sphereTransform, 
 		1.0f,
@@ -210,7 +203,8 @@ Scene::Scene()
 	std::cout << "Using move constructor" << std::endl;
 
 	// bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
-	bunnyMesh = std::make_shared<BVH>(bunnyTransform, std::move(bunny_list));
+	// bunnyMesh = std::make_shared<BVH>(bunnyTransform, std::move(bunny_list));
+	bunnyMesh = std::make_shared<TransformedBVH>(bunnyTransform, std::move(bunny_list));
 
 	std::vector<IDistanceRef> blendingEntityList
 		= { sphere, bunnyMesh };

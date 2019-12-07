@@ -1,5 +1,12 @@
 #include "transform.hpp"
 
+Vector3 ApplyTransform(Transform transform, Vector3 point)
+{
+	return 
+		linalg::mul( transform.orientation, point * transform.scale )
+		+ transform.position;
+}
+
 Vector3 ApplyInverseTransform(Transform transform, Vector3 point)
 {
 	return linalg::mul(linalg::transpose(transform.orientation),
