@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "mesh.hpp"
-#include "bvh.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -15,19 +14,6 @@ namespace
 	std::shared_ptr<Entity> bunnyMesh;
 
 	const float M_PI_MUL2 = 2.0f * static_cast<float>(M_PI);
-}
-
-AABB IDistanceList::GetBoundingBox() const
-{
-    AABB box = m_idistList[0]->GetBoundingBox();
-    for(size_t i = 1; i < m_idistList.size(); ++i)
-    {
-        box = AABB::MergeAABB(
-            box,
-            m_idistList[i]->GetBoundingBox()
-            );
-    }
-    return box;
 }
 
 DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
@@ -45,12 +31,6 @@ DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
         	currentInfo = tmp;
     }
     return currentInfo;
-}
-
-AABB Scene::GetBoundingBox() const
-{
-	// scene acts as the root of BVH tree, this should never be called
-	return m_distanceFuncProvider->GetBoundingBox();
 }
 
 DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const

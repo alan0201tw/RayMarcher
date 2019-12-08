@@ -1,27 +1,5 @@
 #include "mesh.hpp"
 
-#include "bvh.hpp"
-
-AABB Triangle::GetBoundingBox() const
-{
-	const Vector3 v0 = m_vertices[0];
-	const Vector3 v1 = m_vertices[1];
-	const Vector3 v2 = m_vertices[2];
-
-	float minX = std::min(v0.x, std::min(v1.x, v2.x));
-    float minY = std::min(v0.y, std::min(v1.y, v2.y));
-    float minZ = std::min(v0.z, std::min(v1.z, v2.z));
-
-    float maxX = std::max(v0.x, std::max(v1.x, v2.x));
-    float maxY = std::max(v0.y, std::max(v1.y, v2.y));
-    float maxZ = std::max(v0.z, std::max(v1.z, v2.z));
-
-    Vector3 minPoint = Vector3(minX, minY, minZ);
-    Vector3 maxPoint = Vector3(maxX, maxY, maxZ);
-
-    return AABB(minPoint, maxPoint);
-}
-
 DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 {
 	const Vector3 pos = ApplyInverseTransform(m_transform, point);
@@ -56,19 +34,6 @@ DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 
 	return info;
 }
-
- AABB TriangleMesh::GetBoundingBox() const
- {
-	 AABB box = m_triangles[0].GetBoundingBox();
-	 for (size_t i = 1; i < m_triangles.size(); ++i)
-	 {
-		 box = AABB::MergeAABB(
-			 box,
-			 m_triangles[i].GetBoundingBox()
-		 );
-	 }
-	 return box;
- }
 
  DistanceInfo TriangleMesh::GetDistanceInfo(Vector3 point, float time) const
  {

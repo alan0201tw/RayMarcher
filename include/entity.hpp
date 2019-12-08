@@ -11,7 +11,6 @@ protected:
 	Transform m_transform;
 
 public:
-    virtual AABB GetBoundingBox() const override = 0;
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const override = 0;
 
     // getter and setter for transform properties
@@ -55,7 +54,6 @@ public:
 
     ~Sphere() {};
 
-    virtual AABB GetBoundingBox() const final override;
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
 	Sphere(const Sphere& other) = default;
@@ -81,7 +79,6 @@ public:
 
     ~Cube() {};
 
-    virtual AABB GetBoundingBox() const final override;
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
 	Cube(const Cube& other) = default;
