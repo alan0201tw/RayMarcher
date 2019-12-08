@@ -4,13 +4,22 @@
 
 float AABB::GetDistance(Vector3 point) const
 {
-    const Vector3 extent = m_max - m_min;
-    const Vector3 o = abs(point) - extent;
-    const float ud = length(max(o, 0.0f));
-    const float n = std::max(std::max(
-        std::min(o[0], 0.0f), std::min(o[1], 0.0f)), std::min(o[2], 0.0f));
+    // const Vector3 extent = m_max - m_min;
+    // const Vector3 o = abs(point) - extent;
+    // const float ud = length(max(o, 0.0f));
+    // const float n = std::max(std::max(
+    //     std::min(o[0], 0.0f), std::min(o[1], 0.0f)), std::min(o[2], 0.0f));
 
-    return ud + n;
+    // return ud + n;
+    float dx = std::max(m_min.x - point.x, point.x - m_max.x);
+    float dy = std::max(m_min.y - point.y, point.y - m_max.y);
+    float dz = std::max(m_min.z - point.z, point.z - m_max.z);
+
+    dx = std::max(0.0f, dx);
+    dy = std::max(0.0f, dy);
+    dz = std::max(0.0f, dz);
+
+    return std::sqrt(dx*dx + dy*dy + dz*dz);
 }
 
 // static method

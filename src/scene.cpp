@@ -50,7 +50,7 @@ DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
 AABB Scene::GetBoundingBox() const
 {
 	// scene acts as the root of BVH tree, this should never be called
-	return AABB( Vector3(-1e9), Vector3(1e9) );
+	return m_distanceFuncProvider->GetBoundingBox();
 }
 
 DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
@@ -81,11 +81,18 @@ Scene::Scene()
 		1.0f
 	};
 
+	// const Transform bunnyTransform =
+	// {
+	// 	Vector3(1.0f, -2.0f, 0.0f),
+	// 	Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
+	// 	35.0f
+	// };
+	// bunnyLow
 	const Transform bunnyTransform =
 	{
-		Vector3(1.0f, -2.0f, 0.0f),
+		Vector3(0.0f, 0.0f, 0.0f),
 		Matrix3x3({1,0,0}, {0,1,0}, {0,0,1}),
-		35.0f
+		5.0f
 	};
 
 	const Transform plane0Transform = 
@@ -136,7 +143,7 @@ Scene::Scene()
 	std::string warn;
 	std::string err;
 
-	tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, "./resources/bunny.obj");
+	tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, "./resources/bunnyLow.obj");
 	if (!warn.empty())
 	{
 		std::cout << warn << std::endl;
@@ -147,7 +154,7 @@ Scene::Scene()
 	}
 
 	std::vector<Triangle> bunny_list;
-	//std::vector<IDistanceRef> bunny_list;
+	// std::vector<IDistanceRef> bunny_list;
 	bunny_list.reserve(shapes.size());
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++)
@@ -174,9 +181,30 @@ Scene::Scene()
 			// Use emplace_back to reduce the amount of instantiation
 			// bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
 			bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
-			//bunny_list.push_back(
-			//	std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
-			//);
+			// bunny_list.push_back(
+			// 	std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+			// );
+
+			{
+				auto rightTransform = identityTransform;
+				rightTransform.position += Vector3(0.8f, 0.5f, -1.0f);
+				rightTransform.scale *= 0.5f;
+				
+				bunny_list.emplace_back(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+				// bunny_list.push_back(
+				// 	std::make_shared<Triangle>(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+				// );
+			}
+			{
+				auto leftTransform = identityTransform;
+				leftTransform.position += Vector3(-0.8f, 0.5f, -1.0f);
+				leftTransform.scale *= 0.5f;
+
+				bunny_list.emplace_back(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+				// bunny_list.push_back(
+				// 	std::make_shared<Triangle>(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+				// );
+			}
 
 			index_offset += fv;
 		}
@@ -202,16 +230,16 @@ Scene::Scene()
 
 	std::cout << "Using move constructor" << std::endl;
 
+	// bunnyLow : 135, bunny : 4968
+	std::cout << "bunny_list.size() = " << bunny_list.size() << std::endl;
+
 	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
-	// bunnyMesh = std::make_shared<BVH>(bunnyTransform, std::move(bunny_list));
-	//bunnyMesh = std::make_shared<TransformedBVH>(bunnyTransform, std::move(bunny_list));
+	// bunnyMesh = std::make_shared<TransformedBVH>(bunnyTransform, std::move(bunny_list));
 
 	std::vector<IDistanceRef> blendingEntityList
 		= { sphere, bunnyMesh };
 	IDistanceRef blendingEntity
 		= std::make_shared<MeshBlender>(std::move(blendingEntityList), 3.0f);
-
-	blendingEntityList.push_back(sphere);
 
 	std::vector<IDistanceRef> sceneList
 		= { blendingEntity, plane0, plane1 };

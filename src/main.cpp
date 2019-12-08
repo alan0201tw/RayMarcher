@@ -193,7 +193,7 @@ int main(int argc, char* argv[])
     // time parameters to support animation output
     float currentTime = 0.0f;
 
-    while(currentTime <= 1.0f)
+    while(currentTime <= 0.0f)
     {
         ss << "output/output_";
         ss << imageIndex;

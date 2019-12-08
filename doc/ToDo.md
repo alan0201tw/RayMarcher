@@ -30,7 +30,7 @@
     * Each entity type has to consider its own transform in its GetBoundingBox method
         * currently only consider position
 
-    * bunnyLow.obj without BVH
+    * bunnyLow.obj without BVH (100 images on Ubuntu 18.04)
     ```
     real	82m4.230s
     user	271m59.557s
@@ -53,6 +53,26 @@
     real    14m16.287s
     user    0m0.000s
     sys     0m0.000s 
+    ```
+
+    ```
+    3 bunnyLow, reference image in exports
+
+    using BVH, with new AABB Distance function
+    the original one shares the same function as Cube, which
+    might be too much of an overhead
+
+    bunny_list.size() = 405
+
+    real    3m36.527s
+    user    11m44.892s
+    sys     0m1.318s
+
+    bunny_list.size() = 405
+
+    real    2m33.775s
+    user    8m18.036s
+    sys     0m1.142s
     ```
 
 

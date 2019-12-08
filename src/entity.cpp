@@ -4,7 +4,10 @@
 
 AABB Sphere::GetBoundingBox() const
 {
-    Vector3 radiusVector(m_radius, m_radius, m_radius);
+    throw std::runtime_error(
+        "Sphere::GetBoundingBox currently does not support transform");
+
+    Vector3 radiusVector(m_radius * m_transform.scale);
 
     return AABB( m_transform.position - radiusVector, 
         m_transform.position + radiusVector );
@@ -24,7 +27,12 @@ DistanceInfo Sphere::GetDistanceInfo(Vector3 point, float time) const
 
 AABB Cube::GetBoundingBox() const
 {
-    Vector3 halfExtent(m_extent * 0.5f);
+    throw std::runtime_error(
+        "Cube::GetBoundingBox currently does not support transform");
+
+    // by doubling the extent vector, we should be able to neglect rotation
+    Vector3 halfExtent(m_extent * 0.5f * m_transform.scale);
+    halfExtent *= 2.0f;
 
     return AABB( m_transform.position - halfExtent, 
         m_transform.position + halfExtent );
