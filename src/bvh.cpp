@@ -1,11 +1,13 @@
 #include "bvh.hpp"
 
 #include <algorithm>
+#include <iostream>
 
 float AABB::GetDistance(Vector3 point) const
 {
     // const Vector3 extent = m_max - m_min;
-    // const Vector3 o = abs(point) - extent;
+    // const Vector3 pos = (m_max + m_min) / 2.0f;
+    // const Vector3 o = abs(point - pos) - extent;
     // const float ud = length(max(o, 0.0f));
     // const float n = std::max(std::max(
     //     std::min(o[0], 0.0f), std::min(o[1], 0.0f)), std::min(o[2], 0.0f));
@@ -19,6 +21,8 @@ float AABB::GetDistance(Vector3 point) const
     dy = std::max(0.0f, dy);
     dz = std::max(0.0f, dz);
 
+    // Since the AABB distance is only compared to other AABB distance
+    // might be able to remove the sqrt
     return std::sqrt(dx*dx + dy*dy + dz*dz);
 }
 
@@ -152,14 +156,14 @@ DistanceInfo BVH::GetDistanceInfo(Vector3 point, float time) const
 {
     const Vector3 pos = point;
 
-    DistanceInfo leftInfo = m_leftBVH->GetDistanceInfo(pos, time);
-    DistanceInfo rightInfo = m_rightBVH->GetDistanceInfo(pos, time);
+    const float leftBBDist = m_leftBVH->GetBoundingBox().GetDistance(pos);
+    const float rightBBDist = m_rightBVH->GetBoundingBox().GetDistance(pos);
 
     // return the left bvh info
-    if(leftInfo.distance < rightInfo.distance)
-        return leftInfo;
+    if(leftBBDist < rightBBDist)
+        return m_leftBVH->GetDistanceInfo(point, time);
     // return the right bvh info
-    return rightInfo;
+    return m_rightBVH->GetDistanceInfo(point, time);
 }
 
 AABB BVH::GetBoundingBox() const
@@ -167,12 +171,14 @@ AABB BVH::GetBoundingBox() const
     return m_boundingBox;
 }
 
-AABB TransformedBVH::GetBoundingBox() const
+////////////////////////////////////////////////////////////////
+
+AABB TransformedBVH::GetTransformedAABB(Transform transform, AABB aabb)
 {
     Vector3 minimal(1e9, 1e9, 1e9);
     Vector3 maximal(-1e9, -1e9, -1e9);
 
-    const AABB boundingBox = m_bvh.GetBoundingBox();
+    const AABB boundingBox = aabb;
 
     for(int i = 0; i < 2; i++)
     {
@@ -182,13 +188,13 @@ AABB TransformedBVH::GetBoundingBox() const
             {
                 float x = i * boundingBox.GetMax().x
                     + (1 - i) * boundingBox.GetMin().x;
-                float y = j * boundingBox.GetMax().y     
+                float y = j * boundingBox.GetMax().y
                     + (1 - j) * boundingBox.GetMin().y;
                 float z = k * boundingBox.GetMax().z
                     + (1 - k) * boundingBox.GetMin().z;
 
                 Vector3 tester(x, y, z);
-                tester = ApplyTransform(m_transform, tester);
+                tester = ApplyTransform(transform, tester);
                 for(int c = 0; c < 3; c++)
                 {
                     if(tester[c] > maximal[c])
@@ -200,15 +206,31 @@ AABB TransformedBVH::GetBoundingBox() const
         }
     }
 
+    // std::cout << "minimal = "
+    //     << minimal.x << ", "
+    //     << minimal.y << ", "
+    //     << minimal.z << std::endl;
+
+    // std::cout << "maximal = "
+    //     << maximal.x << ", "
+    //     << maximal.y << ", "
+    //     << maximal.z << std::endl;
+
     return AABB(minimal, maximal);
+}
+
+AABB TransformedBVH::GetBoundingBox() const
+{
+    // return m_bvh.GetBoundingBox();
+    return GetTransformedAABB(m_transform, m_bvh.GetBoundingBox());
 }
 
 DistanceInfo TransformedBVH::GetDistanceInfo(Vector3 point, float time) const
 {
     Vector3 pos = ApplyInverseTransform(m_transform, point);
+
     DistanceInfo info = m_bvh.GetDistanceInfo(pos, time);
-    // do inverse transform on distance,
-    // a scalar needs only scaling
+
     info.distance *= m_transform.scale;
 
     return info;

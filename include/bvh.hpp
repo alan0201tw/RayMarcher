@@ -66,6 +66,8 @@ class TransformedBVH final : public Entity
 private:
     BVH m_bvh;
 
+    static AABB GetTransformedAABB(Transform transform, AABB aabb);
+
 public:
 
     TransformedBVH(

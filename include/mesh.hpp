@@ -34,6 +34,8 @@ public:
 
 	~Triangle() {};
 
+	static size_t s_getBBCount, s_getDistCount;
+
 	virtual AABB GetBoundingBox() const final override;
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
@@ -49,7 +51,6 @@ public:
  	// TODO : change to BVH 
  	std::vector<Triangle> m_triangles;
 	
-
  public:
  	explicit TriangleMesh(
  		const Transform& transform,
