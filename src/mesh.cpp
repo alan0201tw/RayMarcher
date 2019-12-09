@@ -9,17 +9,17 @@ DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 	const Vector3 c = m_vertices[2];
 	const Vector3 p = pos;
 
-	const Vector3 ba = b - a; const Vector3 pa = p - a;
-	const Vector3 cb = c - b; const Vector3 pb = p - b;
-	const Vector3 ac = a - c; const Vector3 pc = p - c;
+	const Vector3 pa = p - a;
+	const Vector3 pb = p - b;
+	const Vector3 pc = p - c;
 	const Vector3 nor = -m_normal;
 
 	DistanceInfo info;
 
 	info.distance = std::sqrt(
-		(sign(dot(cross(ba, nor), pa)) + 
-		 sign(dot(cross(cb, nor), pb)) +
-		 sign(dot(cross(ac, nor), pc)) < 2.0f)
+		(sign(dot(cross_ba_normal, pa)) +
+		 sign(dot(cross_cb_normal, pb)) +
+		 sign(dot(cross_ac_normal, pc)) < 2.0f)
 		?
 		std::min(std::min(
 			linalg::length2(ba*std::clamp(dot(ba, pa) / linalg::length2(ba), 0.0f, 1.0f) - pa),

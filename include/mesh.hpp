@@ -21,15 +21,29 @@ private:
 		return (value < 0.0f) ? -1.0f : 1.0f;
 	}
 
+	const Vector3 ba;
+	const Vector3 cb;
+	const Vector3 ac;
+	const Vector3 cross_ba_normal;
+	const Vector3 cross_cb_normal;
+	const Vector3 cross_ac_normal;
+
 public:
 	explicit Triangle(
 		const Transform& transform,
 		const std::array<Vector3, 3>& vertices,
 		const Vector3& color
 		)
-		: Entity(transform), m_vertices(vertices), m_color(color)
+		: Entity(transform), m_vertices(vertices)
+		, m_normal(safe_normalize(linalg::cross(vertices[1] - vertices[0], vertices[2] - vertices[0])))
+		, m_color(color)
+		, ba(vertices[1] - vertices[0])
+		, cb(vertices[2] - vertices[1])
+		, ac(vertices[0] - vertices[2])
+		, cross_ba_normal(linalg::cross(ba, -m_normal))
+		, cross_cb_normal(linalg::cross(cb, -m_normal))
+		, cross_ac_normal(linalg::cross(ac, -m_normal))
 		{
-			m_normal = safe_normalize(linalg::cross(m_vertices[1] - m_vertices[0], m_vertices[2] - m_vertices[0]));
 		}
 
 	~Triangle() {};

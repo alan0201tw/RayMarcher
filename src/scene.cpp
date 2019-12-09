@@ -166,21 +166,21 @@ Scene::Scene()
 			// );
 
 			{
-				auto rightTransform = identityTransform;
-				rightTransform.position += Vector3(0.8f, 0.5f, -1.0f);
-				rightTransform.scale *= 0.5f;
+				// auto rightTransform = identityTransform;
+				// rightTransform.position += Vector3(0.8f, 0.5f, -1.0f);
+				// rightTransform.scale *= 0.5f;
 				
-				bunny_list.emplace_back(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+				// bunny_list.emplace_back(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f );
 				// bunny_list.push_back(
 				// 	std::make_shared<Triangle>(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f )
 				// );
 			}
 			{
-				auto leftTransform = identityTransform;
-				leftTransform.position += Vector3(-0.8f, 0.5f, -1.0f);
-				leftTransform.scale *= 0.5f;
+				// auto leftTransform = identityTransform;
+				// leftTransform.position += Vector3(-0.8f, 0.5f, -1.0f);
+				// leftTransform.scale *= 0.5f;
 
-				bunny_list.emplace_back(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+				// bunny_list.emplace_back(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f );
 				// bunny_list.push_back(
 				// 	std::make_shared<Triangle>(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f )
 				// );
