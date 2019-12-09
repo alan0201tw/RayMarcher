@@ -65,6 +65,34 @@ void write_to_image(size_t u, size_t v, rgb01 value)
     image[v * 3 * image_width + u * 3 + 2] = b255;
 }
 
+float ComputeShadow(Ray ray, float dstToShadePoint, float time)
+{
+    float rayDst = 0;
+    int marchSteps = 0;
+    float shadowIntensity = .2;
+    float brightness = 1;
+
+    Vector3 currentPos = ray.GetOrigin();
+
+    while (rayDst < dstToShadePoint)
+    {
+        marchSteps ++;
+        DistanceInfo info = scene.GetDistanceInfo(currentPos, time);
+        float dst = info.distance;
+        
+        if (dst <= 0.001f)
+        {
+            return shadowIntensity;
+        }
+
+        brightness = std::min(brightness, dst * 200.0f);
+
+        currentPos += ray.GetDirection() * dst;
+        rayDst += dst;
+    }
+    return shadowIntensity + (1 - shadowIntensity) * brightness;
+}
+
 rgb01 GetColor(float u, float v, float currentTime)
 {
     static Camera camera(
@@ -78,12 +106,15 @@ rgb01 GetColor(float u, float v, float currentTime)
     const int MAX_ITER = 100; // 100 is a safe number to use, it won't produce too many artifacts and still be quite fast
     const float MAX_DIST = 2000.0f; // Make sure you change this if you have objects farther than 20 units away from the camera
     const float EPSILON = 0.001f; // At this distance we are close enough to the object that we have essentially hit it
+    const float shadowBias = EPSILON * 50;
 
     Ray ray = camera.get_ray(u, v);
 
     float totalDist = 0.0;
     Vector3 pos = ray.GetOrigin();
     float dist = EPSILON;
+
+    const Vector3 lightPosition(-5.0f, 5.0f, 5.0f);
 
     for (int i = 0; i < MAX_ITER; ++i)
     {
@@ -107,7 +138,7 @@ rgb01 GetColor(float u, float v, float currentTime)
             // TEST Result : HOLY SHIT, this works great.
             const Vector3 pointOnSurface = pos + (dist - EPSILON) * ray.GetDirection();
             const Vector3 normal = scene.EvaluateNormal(pointOnSurface, currentTime, EPSILON);
-            const Vector3 lightDirection = safe_normalize(-ray.GetDirection());
+            const Vector3 lightDirection = safe_normalize(lightPosition - pos);
 
             const Vector3 I = -lightDirection;
             const Vector3 N = normal;
@@ -124,6 +155,19 @@ rgb01 GetColor(float u, float v, float currentTime)
 
             Vector3 color = 
                 std::clamp(diffuse, 0.0f, 1.0f) * info.color + specular;
+                // diffuse * info.color + specular;
+
+            // shadow
+            {
+                Vector3 shadowOffsetPos = pointOnSurface + normal * shadowBias;
+                Vector3 shadowOffsetToLight = safe_normalize(lightPosition - shadowOffsetPos);
+
+                Ray shadowRay(shadowOffsetPos, shadowOffsetToLight);
+                float shadowDistToLight = linalg::distance(shadowOffsetPos, lightPosition);
+                float shadowIntensity = ComputeShadow(shadowRay, shadowDistToLight, currentTime);
+
+                color *= shadowIntensity;
+            }
 
             return linalg::clamp(color, 0.0f, 1.0f);
         }
@@ -193,7 +237,7 @@ int main(int argc, char* argv[])
     // time parameters to support animation output
     float currentTime = 0.0f;
 
-    while(currentTime <= 1.0f)
+    while(currentTime <= 0.0f)
     {
         ss << "output/output_";
         ss << imageIndex;
