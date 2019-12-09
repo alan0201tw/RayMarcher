@@ -20,62 +20,6 @@
     * Compare shared_ptr and raw pointer performance
     * That I do not call make_shared while multi-threading
 
-* BVH or Parallel triangle SDF in triangle mesh
-    * Current performance is way too poor
-    * One image needs a few seconds?
-    * (Moved to bottom) Triangle lighting quality is poor, maybe lower epsilon for evaluating normal?
-    
-    * BVH has to be constructed every frame 
-        * since it depends on transform, which updates every frame
-    * Each entity type has to consider its own transform in its GetBoundingBox method
-        * currently only consider position
-
-    * bunnyLow.obj without BVH (100 images on Ubuntu 18.04)
-    ```
-    real	82m4.230s
-    user	271m59.557s
-    sys	    0m35.908s
-    ```
-    * bunnyLow.obj With BVH
-    ```
-    real    95m13.382s
-    user    312m0.187s
-    sys     0m36.864s
-    ```
-    * bunny.obj with BVH ( WSL ubuntu )
-    ```
-    real    20m55.495s
-    user    0m0.000s
-    sys     0m0.000s
-    ```
-    * bunny.obj without BVH
-    ```
-    real    14m16.287s
-    user    0m0.000s
-    sys     0m0.000s 
-    ```
-
-    ```
-    3 bunnyLow, reference image in exports
-
-    using BVH, with new AABB Distance function
-    the original one shares the same function as Cube, which
-    might be too much of an overhead
-
-    bunny_list.size() = 405
-
-    real    3m36.527s
-    user    11m44.892s
-    sys     0m1.318s
-
-    bunny_list.size() = 405
-
-    real    2m33.775s
-    user    8m18.036s
-    sys     0m1.142s
-    ```
-
-
 * (O) Transform : Use transpost for inversing rotation
 
 * (O) Improve lighting quality
