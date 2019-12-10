@@ -42,7 +42,7 @@ public:
 	Scene& operator=(Scene &&) = delete;
 
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
-	virtual void Update(float currentTime) const final override;
+	virtual void Update(float currentTime) final override;
 
 	Vector3 EvaluateNormal(Vector3 point, float time, float epsilon = 0.0001f) const;
 };

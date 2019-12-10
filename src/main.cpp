@@ -30,6 +30,7 @@ namespace py = pybind11;
 #include "meshOperation.hpp"
 
 #include "scene.hpp"
+#include "mesh.hpp"
 
 namespace
 {
@@ -208,8 +209,11 @@ static void Render(float currentTime)
     {
         for(size_t j = 0; j < image_height; ++j)
         {
-            rgb01 color = GetColor((float)i / (float)image_width, 
-                  (float)j / (float)image_height);
+            rgb01 color = GetColor(
+                (float)i / (float)image_width, 
+                (float)j / (float)image_height, 
+                currentTime
+                );
 
             write_to_image(i, j, color);
         }
@@ -237,7 +241,7 @@ int main(int argc, char* argv[])
     // time parameters to support animation output
     float currentTime = 0.0f;
 
-    while(currentTime <= 0.0f)
+    while(currentTime <= 1.0f)
     {
         ss << "output/output_";
         ss << imageIndex;

@@ -11,7 +11,7 @@ namespace
 {
 	std::shared_ptr<Entity> sphere;
 	std::shared_ptr<Entity> plane0, plane1;
-	std::shared_ptr<Entity> bunnyMesh;
+	std::shared_ptr<TransformedBVH> bunnyMesh;
 
 	const float M_PI_MUL2 = 2.0f * static_cast<float>(M_PI);
 }
@@ -39,17 +39,23 @@ DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
     return m_distanceFuncProvider->GetDistanceInfo(point, time);
 }
 
-void Scene::Update(float currentTime) const
+void Scene::Update(float currentTime)
 {
 	if (sphere)
+	{
 		sphere->position() = Vector3(8.0f * (0.5f - currentTime));
+	}
 
 	if (bunnyMesh)
+	{
 		bunnyMesh->orientation() = Matrix3x3(
 			{ std::cos(currentTime * M_PI_MUL2), 0, std::sin(currentTime * M_PI_MUL2) },
 			{ 0, 1, 0 },
 			{ -std::sin(currentTime * M_PI_MUL2), 0, std::cos(currentTime * M_PI_MUL2) }
 		);
+
+		bunnyMesh->Update(currentTime);
+	}
 }
 
 Scene::Scene()
@@ -133,8 +139,8 @@ Scene::Scene()
 		std::cerr << err << std::endl;
 	}
 
-	std::vector<Triangle> bunny_list;
-	// std::vector<IDistanceRef> bunny_list;
+	// std::vector<Triangle> bunny_list;
+	std::vector<IDistanceRef> bunny_list;
 	bunny_list.reserve(shapes.size());
 	// Loop over shapes
 	for (size_t s = 0; s < shapes.size(); s++)
@@ -160,6 +166,7 @@ Scene::Scene()
 
 			// Use emplace_back to reduce the amount of instantiation
 			// bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
+<<<<<<< HEAD
 			bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
 			// bunny_list.push_back(
 			// 	std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
@@ -185,6 +192,33 @@ Scene::Scene()
 				// 	std::make_shared<Triangle>(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f )
 				// );
 			}
+=======
+			// bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+			bunny_list.push_back(
+				std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+			);
+
+			// {
+			// 	auto rightTransform = identityTransform;
+			// 	rightTransform.position += Vector3(0.8f, 0.5f, -1.0f);
+			// 	rightTransform.scale *= 0.5f;
+				
+			// 	bunny_list.emplace_back(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+			// 	// bunny_list.push_back(
+			// 	// 	std::make_shared<Triangle>(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+			// 	// );
+			// }
+			// {
+			// 	auto leftTransform = identityTransform;
+			// 	leftTransform.position += Vector3(-0.8f, 0.5f, -1.0f);
+			// 	leftTransform.scale *= 0.5f;
+
+			// 	bunny_list.emplace_back(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+			// 	// bunny_list.push_back(
+			// 	// 	std::make_shared<Triangle>(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+			// 	// );
+			// }
+>>>>>>> d2e310bfee8fbbab75defe885df2dbddea344ddf
 
 			index_offset += fv;
 		}
@@ -213,8 +247,8 @@ Scene::Scene()
 	// bunnyLow : 135, bunny : 4968
 	std::cout << "bunny_list.size() = " << bunny_list.size() << std::endl;
 
-	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
-	// bunnyMesh = std::make_shared<TransformedBVH>(bunnyTransform, std::move(bunny_list));
+	// bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, std::move(bunny_list));
+	bunnyMesh = std::make_shared<TransformedBVH>(bunnyTransform, std::move(bunny_list));
 
 	std::vector<IDistanceRef> blendingEntityList
 		= { sphere, bunnyMesh };
@@ -224,21 +258,6 @@ Scene::Scene()
 	std::vector<IDistanceRef> sceneList
 		= { blendingEntity, plane0, plane1 };
 	m_distanceFuncProvider = std::make_shared<IDistanceList>(std::move(sceneList));
-
-#else
-
-	std::cout << "Using copy constructor" << std::endl;
-
-	bunnyMesh = std::make_shared<TriangleMesh>(bunnyTransform, bunny_list);
-
-	std::vector<IDistanceRef> blendingEntityList
-		= { sphere, bunnyMesh };
-	IDistanceRef blendingEntity
-		= std::make_shared<MeshBlender>(blendingEntityList, 3.0f);
-
-	std::vector<IDistanceRef> sceneList
-		= { blendingEntity, plane0, plane1 };
-	m_distanceFuncProvider = std::make_shared<IDistanceList>(sceneList);
 
 #endif
 }

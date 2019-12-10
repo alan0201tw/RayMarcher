@@ -62,7 +62,6 @@ public:
  	// TODO : change to BVH 
  	std::vector<Triangle> m_triangles;
 	
-
  public:
  	explicit TriangleMesh(
  		const Transform& transform,
