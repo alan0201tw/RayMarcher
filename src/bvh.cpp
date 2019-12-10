@@ -156,14 +156,27 @@ DistanceInfo BVH::GetDistanceInfo(Vector3 point, float time) const
 {
     const Vector3 pos = point;
 
-    const float leftBBDist = m_leftBVH->GetBoundingBox().GetDistance(pos);
-    const float rightBBDist = m_rightBVH->GetBoundingBox().GetDistance(pos);
+    const DistanceInfo rightInfo = m_rightBVH->GetDistanceInfo(pos, time);
+    if(m_leftBVH->GetBoundingBox().GetDistance(pos) > rightInfo.distance)
+    {
+        // if the largest distance from right node is lesser than
+        // the smallest distance from left node, skip right node and 
+        // just return right info
+        return rightInfo;
+    }
+    else
+    {
+        auto leftInfo = m_leftBVH->GetDistanceInfo(pos, time);
+        if(leftInfo.distance < rightInfo.distance)
+            return leftInfo;
+        return rightInfo;
+    }
 
-    // return the left bvh info
-    if(leftBBDist < rightBBDist)
-        return m_leftBVH->GetDistanceInfo(point, time);
-    // return the right bvh info
-    return m_rightBVH->GetDistanceInfo(point, time);
+    // // return the left bvh info
+    // if(leftBBDist < rightBBDist)
+    //     return m_leftBVH->GetDistanceInfo(point, time);
+    // // return the right bvh info
+    // return m_rightBVH->GetDistanceInfo(point, time);
 }
 
 AABB BVH::GetBoundingBox() const

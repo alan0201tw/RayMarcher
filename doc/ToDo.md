@@ -56,23 +56,23 @@
     ```
 
     ```
-    3 bunnyLow, reference image in exports
+    Using move constructor
+    bunny_list.size() = 135
+    Triangle::GetBoundingBox() is called 406742484 times
+    Triangle::GetDistanceInfo() is called 717142022 times
 
-    using BVH, with new AABB Distance function
-    the original one shares the same function as Cube, which
-    might be too much of an overhead
+    real    0m57.920s
+    user    0m57.912s
+    sys     0m0.005s
+    ---------------------
+    Using move constructor
+    bunny_list.size() = 135
+    Triangle::GetBoundingBox() is called 0 times
+    Triangle::GetDistanceInfo() is called 1904521005 times
 
-    bunny_list.size() = 405
-
-    real    3m36.527s
-    user    11m44.892s
-    sys     0m1.318s
-
-    bunny_list.size() = 405
-
-    real    2m33.775s
-    user    8m18.036s
-    sys     0m1.142s
+    real    2m5.179s
+    user    2m5.158s
+    sys     0m0.017s
     ```
 
 
