@@ -70,7 +70,7 @@ float ComputeShadow(Ray ray, float dstToShadePoint, float time)
 {
     float rayDst = 0;
     int marchSteps = 0;
-    float shadowIntensity = .2;
+    float shadowIntensity = 0.2f;
     float brightness = 1;
 
     Vector3 currentPos = ray.GetOrigin();

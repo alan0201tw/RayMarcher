@@ -48,6 +48,7 @@ public:
 
 	~Triangle() {};
 
+	virtual AABB GetBoundingBox() const final override;
 	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
 	Triangle(const Triangle& other) = default;
@@ -79,6 +80,7 @@ public:
 
  	~TriangleMesh() {};
 
+	virtual AABB GetBoundingBox() const final override;
  	virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
  	TriangleMesh(const TriangleMesh& other) = default;

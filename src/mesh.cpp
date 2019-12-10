@@ -1,7 +1,5 @@
 #include "mesh.hpp"
 
-<<<<<<< HEAD
-=======
 #include "bvh.hpp"
 
 AABB Triangle::GetBoundingBox() const
@@ -30,7 +28,6 @@ AABB Triangle::GetBoundingBox() const
     return AABB(minPoint, maxPoint);
 }
 
->>>>>>> d2e310bfee8fbbab75defe885df2dbddea344ddf
 DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 {
 	const Vector3 pos = ApplyInverseTransform(m_transform, point);

@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "mesh.hpp"
+#include "bvh.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
@@ -14,6 +15,19 @@ namespace
 	std::shared_ptr<TransformedBVH> bunnyMesh;
 
 	const float M_PI_MUL2 = 2.0f * static_cast<float>(M_PI);
+}
+
+AABB IDistanceList::GetBoundingBox() const
+{
+	AABB box = m_idistList[0]->GetBoundingBox();
+	for (size_t i = 1; i < m_idistList.size(); ++i)
+	{
+		box = AABB::MergeAABB(
+			box,
+			m_idistList[i]->GetBoundingBox()
+		);
+	}
+	return box;
 }
 
 DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
@@ -31,6 +45,12 @@ DistanceInfo IDistanceList::GetDistanceInfo(Vector3 point, float time) const
         	currentInfo = tmp;
     }
     return currentInfo;
+}
+
+AABB Scene::GetBoundingBox() const
+{
+	// scene acts as the root of BVH tree, this should never be called
+	return m_distanceFuncProvider->GetBoundingBox();
 }
 
 DistanceInfo Scene::GetDistanceInfo(Vector3 point, float time) const
@@ -166,11 +186,11 @@ Scene::Scene()
 
 			// Use emplace_back to reduce the amount of instantiation
 			// bunny_list.push_back(Triangle(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f ));
-<<<<<<< HEAD
-			bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
-			// bunny_list.push_back(
-			// 	std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
-			// );
+
+			//bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
+			bunny_list.push_back(
+			std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
+			);
 
 			{
 				// auto rightTransform = identityTransform;
@@ -192,33 +212,6 @@ Scene::Scene()
 				// 	std::make_shared<Triangle>(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f )
 				// );
 			}
-=======
-			// bunny_list.emplace_back(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f );
-			bunny_list.push_back(
-				std::make_shared<Triangle>(identityTransform, vertices, Vector3(230, 67, 83) / 255.0f )
-			);
-
-			// {
-			// 	auto rightTransform = identityTransform;
-			// 	rightTransform.position += Vector3(0.8f, 0.5f, -1.0f);
-			// 	rightTransform.scale *= 0.5f;
-				
-			// 	bunny_list.emplace_back(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f );
-			// 	// bunny_list.push_back(
-			// 	// 	std::make_shared<Triangle>(rightTransform, vertices, Vector3(230, 67, 83) / 255.0f )
-			// 	// );
-			// }
-			// {
-			// 	auto leftTransform = identityTransform;
-			// 	leftTransform.position += Vector3(-0.8f, 0.5f, -1.0f);
-			// 	leftTransform.scale *= 0.5f;
-
-			// 	bunny_list.emplace_back(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f );
-			// 	// bunny_list.push_back(
-			// 	// 	std::make_shared<Triangle>(leftTransform, vertices, Vector3(230, 67, 83) / 255.0f )
-			// 	// );
-			// }
->>>>>>> d2e310bfee8fbbab75defe885df2dbddea344ddf
 
 			index_offset += fv;
 		}
