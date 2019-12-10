@@ -2,12 +2,13 @@
 
 #include "bvh.hpp"
 
-size_t Triangle::s_getBBCount = 0;
-size_t Triangle::s_getDistCount = 0;
-
 AABB Triangle::GetBoundingBox() const
 {
-	s_getBBCount++;
+	if(!(m_transform == identityTransform))
+	{
+		throw std::runtime_error(
+			"Current Trignalge Bounding Box does not support transform!");
+	}
 
 	const Vector3 v0 = m_vertices[0];
 	const Vector3 v1 = m_vertices[1];
@@ -29,8 +30,6 @@ AABB Triangle::GetBoundingBox() const
 
 DistanceInfo Triangle::GetDistanceInfo(Vector3 point, float time) const
 {
-	s_getDistCount++;
-
 	const Vector3 pos = ApplyInverseTransform(m_transform, point);
 
 	const Vector3 a = m_vertices[0];

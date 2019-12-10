@@ -42,7 +42,7 @@ namespace
 
     typedef Vector3 rgb01;
 
-	const Scene scene;
+	Scene scene;
 }
 
 void write_to_image(size_t u, size_t v, rgb01 value)
@@ -142,7 +142,7 @@ static void Render(float currentTime)
     // using thread pool for parallelism
     // for simple scene, thread overhead actually slows down the process
     // when it becomes more complex, switch to 2D parallel
-#if 0
+#if 1
     ThreadPool pool(8);
 
     for(size_t i = 0; i < image_width; ++i)
@@ -197,7 +197,7 @@ int main(int argc, char* argv[])
     // time parameters to support animation output
     float currentTime = 0.0f;
 
-    while(currentTime <= 0.0f)
+    while(currentTime <= 1.0f)
     {
         ss << "output/output_";
         ss << imageIndex;
@@ -213,12 +213,6 @@ int main(int argc, char* argv[])
         ++imageIndex;
         ss.str(std::string());
     }
-
-    std::cout << "Triangle::GetBoundingBox() is called "
-        << Triangle::s_getBBCount << " times" << std::endl;
-
-    std::cout << "Triangle::GetDistanceInfo() is called "
-        << Triangle::s_getDistCount << " times" << std::endl;
 }
 
 #else

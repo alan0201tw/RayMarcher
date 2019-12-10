@@ -20,42 +20,17 @@
     * Compare shared_ptr and raw pointer performance
     * That I do not call make_shared while multi-threading
 
-* BVH or Parallel triangle SDF in triangle mesh
+* (O) BVH or Parallel triangle SDF in triangle mesh
     * Current performance is way too poor
     * One image needs a few seconds?
     * (Moved to bottom) Triangle lighting quality is poor, maybe lower epsilon for evaluating normal?
     
-    * BVH has to be constructed every frame 
+    * (X) BVH has to be constructed every frame 
         * since it depends on transform, which updates every frame
     * Each entity type has to consider its own transform in its GetBoundingBox method
         * currently only consider position
-
-    * bunnyLow.obj without BVH (100 images on Ubuntu 18.04)
     ```
-    real	82m4.230s
-    user	271m59.557s
-    sys	    0m35.908s
-    ```
-    * bunnyLow.obj With BVH
-    ```
-    real    95m13.382s
-    user    312m0.187s
-    sys     0m36.864s
-    ```
-    * bunny.obj with BVH ( WSL ubuntu )
-    ```
-    real    20m55.495s
-    user    0m0.000s
-    sys     0m0.000s
-    ```
-    * bunny.obj without BVH
-    ```
-    real    14m16.287s
-    user    0m0.000s
-    sys     0m0.000s 
-    ```
-
-    ```
+    [Single thread]
     Using move constructor
     bunny_list.size() = 135
     Triangle::GetBoundingBox() is called 406742484 times
@@ -73,6 +48,56 @@
     real    2m5.179s
     user    2m5.158s
     sys     0m0.017s
+    ---------------------
+    [MultiThread with BVH]
+    Using move constructor
+    bunny_list.size() = 135
+
+    real    0m25.508s
+    user    1m25.397s
+    sys     0m0.742s
+    ---------------------
+    [MultiThread without BVH]
+    Using move constructor
+    bunny_list.size() = 135
+
+    real    0m50.308s
+    user    2m42.952s
+    sys     0m0.290s
+    ---------------------
+    [MultiThread without BVH, on my Windows machine]
+    bunny.obj , 4968 triangles
+    real    14m16.287s
+    user    0m0.000s
+    sys     0m0.000s
+    ---------------------
+    [MultiThread with BVH, on Ubuntu, my laptop]
+    Using move constructor
+    bunny_list.size() = 4968
+
+    real    8m34.897s
+    user    33m35.018s
+    sys     0m0.519s
+    --------------------
+    [MultiThread without BVH, on Ubuntu, my laptop]
+    Using move constructor
+    bunny_list.size() = 4968
+
+    real    24m28.826s
+    user    96m47.536s
+    sys     0m0.628s
+    --------------------
+    [MultiThread without BVH, on Ubuntu, my laptop]
+    [bunnyLow 100 images]
+    real	82m4.230s
+    user	271m59.557s
+    sys	    0m35.908s
+    --------------------
+    [MultiThread with BVH, on Ubuntu, my laptop]
+    [bunnyLow 100 images]
+    real    42m16.707s
+    user    162m54.638s
+    sys     0m3.479s
     ```
 
 

@@ -26,7 +26,7 @@ public:
     static AABB MergeAABB(const AABB& a, const AABB& b);
 };
 
-class BVH : public IDistance
+class BVH : public IDistance, public IUpdate
 {
 protected:
     std::vector<IDistanceRef> m_elements;
@@ -39,11 +39,15 @@ public:
 
     virtual ~BVH() {};
 
+    virtual void Update(float currentTime) final override;
     virtual AABB GetBoundingBox() const final override;
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 
 // Functors for comparing / sorting entities
 private:
+
+    void UpdateBVH();
+
     class box_x_compare
     {
     public:
@@ -61,7 +65,7 @@ private:
     };
 };
 
-class TransformedBVH final : public Entity
+class TransformedBVH final : public Entity, public IUpdate
 {
 private:
     BVH m_bvh;
@@ -86,6 +90,7 @@ public:
 
     ~TransformedBVH() {}
 
+    virtual void Update(float currentTime) final override;
     virtual AABB GetBoundingBox() const final override;
     virtual DistanceInfo GetDistanceInfo(Vector3 point, float time) const final override;
 };

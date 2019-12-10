@@ -11,6 +11,11 @@ struct Transform
 	// currently only support uniform scale
 	// non-uniform scale is too complicated to implement
 	float scale;
+
+    bool operator==(const Transform& other) const
+    {
+        return (position == other.position) && (orientation == other.orientation);
+    }
 };
 
 const Transform identityTransform = 

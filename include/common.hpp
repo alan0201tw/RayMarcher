@@ -24,7 +24,7 @@ public:
 class IUpdate
 {
 public:
-	virtual void Update(float currentTime) const = 0;
+	virtual void Update(float currentTime) = 0;
 };
 
 using IDistanceRef = std::shared_ptr<IDistance>;
