@@ -63,3 +63,23 @@ DistanceInfo MeshBlender::GetDistanceInfo(Vector3 point, float time) const
     }
     return currentInfo;
 }
+
+AABB MeshSubtractor::GetBoundingBox() const
+{
+    return m_minuend->GetBoundingBox();
+}
+
+DistanceInfo MeshSubtractor::GetDistanceInfo(Vector3 point, float time) const
+{
+    if(m_minuend == nullptr || m_subtrahend == nullptr)
+    {
+        throw std::runtime_error(
+            "MeshSubtractor dealing with empty minuend or subtrahend!");
+    }
+
+    DistanceInfo info = m_minuend->GetDistanceInfo(point, time);
+    float subtrahendDist = m_subtrahend->GetDistanceInfo(point, time).distance;
+    info.distance = std::max(info.distance, -1 * subtrahendDist);
+
+    return info;
+}

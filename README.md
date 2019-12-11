@@ -10,3 +10,5 @@
 ![bunny](./exports/bunny.png)
 
 ![3bunnyLow](./exports/bunnyLow3.png)
+
+![meshSubtraction](./exports/mesh_subtraction.png)
