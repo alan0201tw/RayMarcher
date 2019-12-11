@@ -20,8 +20,6 @@
     * Compare shared_ptr and raw pointer performance
     * That I do not call make_shared while multi-threading
 
-<<<<<<< HEAD
-=======
 * (O) BVH or Parallel triangle SDF in triangle mesh
     * Current performance is way too poor
     * One image needs a few seconds?
@@ -103,7 +101,6 @@
     ```
 
 
->>>>>>> d2e310bfee8fbbab75defe885df2dbddea344ddf
 * (O) Transform : Use transpost for inversing rotation
 
 * (O) Improve lighting quality
