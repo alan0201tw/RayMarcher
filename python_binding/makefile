@@ -1,11 +1,3 @@
-########################################
-##
-##  This makefile is for building 
-##  the ray marcher as a shared object 
-##  for testing.
-##
-########################################
-
 # Compile Info
 CC := clang++
 SRCEXT := cpp
@@ -37,9 +29,6 @@ $(BINDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 clean:
 	@echo " Cleaning...";
 	@echo "$(RM) -r $(BINDIR) $(TARGET)"; $(RM) -r $(BINDIR) $(TARGET)
-
-test:
-	pytest test.py -v -s
 
 # Declare as utility, not a file
 .PHONY: clean test

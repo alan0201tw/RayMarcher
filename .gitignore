@@ -22,5 +22,8 @@ output/*
 test/bin/*
 test/*.png
 
+# python_binding
+python_binding/bin/*
+
 # allow exported file collections
 !/exports/*.mp4
