@@ -227,52 +227,52 @@ Scene::Scene()
 	IDistanceRef blendingEntity
 		= std::make_shared<MeshBlender>(std::move(blendingEntityList), 3.0f);
 
-	const Transform horizontalTransform = 
-	{
-		Vector3(-3.0f, 0.0f, 0.0f),
-		identityTransform.orientation,
-		identityTransform.scale
-	};
+	// const Transform horizontalTransform = 
+	// {
+	// 	Vector3(-3.0f, 0.0f, 0.0f),
+	// 	identityTransform.orientation,
+	// 	identityTransform.scale
+	// };
 
-	IDistanceRef minuendSphere
-		= std::make_shared<Sphere>(
-		horizontalTransform,
-		1.5f,
-		Vector3(200, 50, 125) / 255.0f
-	);
+	// IDistanceRef minuendSphere
+	// 	= std::make_shared<Sphere>(
+	// 	horizontalTransform,
+	// 	1.5f,
+	// 	Vector3(200, 50, 125) / 255.0f
+	// );
 
-	IDistanceRef subtrahendCube
-		= std::make_shared<Cube>(
-		horizontalTransform,
-		Vector3(10.0f, 0.5f, 10.0f),
-		Vector3(0, 0, 0)
-	);
+	// IDistanceRef subtrahendCube
+	// 	= std::make_shared<Cube>(
+	// 	horizontalTransform,
+	// 	Vector3(10.0f, 0.5f, 10.0f),
+	// 	Vector3(0, 0, 0)
+	// );
 
-	IDistanceRef subtrahendCube1
-		= std::make_shared<Cube>(
-		horizontalTransform,
-		Vector3(10.0f, 10.0f, 0.5f),
-		Vector3(0, 0, 0)
-	);
+	// IDistanceRef subtrahendCube1
+	// 	= std::make_shared<Cube>(
+	// 	horizontalTransform,
+	// 	Vector3(10.0f, 10.0f, 0.5f),
+	// 	Vector3(0, 0, 0)
+	// );
 
-	IDistanceRef subtrahendCube2
-		= std::make_shared<Cube>(
-		horizontalTransform,
-		Vector3(0.5f, 10.0f, 10.0f),
-		Vector3(0, 0, 0)
-	);
+	// IDistanceRef subtrahendCube2
+	// 	= std::make_shared<Cube>(
+	// 	horizontalTransform,
+	// 	Vector3(0.5f, 10.0f, 10.0f),
+	// 	Vector3(0, 0, 0)
+	// );
 
-	std::vector<IDistanceRef> subtrahendList
-		= { subtrahendCube, subtrahendCube1, subtrahendCube2 };
+	// std::vector<IDistanceRef> subtrahendList
+	// 	= { subtrahendCube, subtrahendCube1, subtrahendCube2 };
 
-	// test out mesh subtraction
-	IDistanceRef meshSubtraction
-		= std::make_shared<MeshSubtractor>(minuendSphere, 
-		std::make_shared<IDistanceList>(subtrahendList));
+	// // test out mesh subtraction
+	// IDistanceRef meshSubtraction
+	// 	= std::make_shared<MeshSubtractor>(minuendSphere, 
+	// 	std::make_shared<IDistanceList>(subtrahendList));
 
 	std::vector<IDistanceRef> sceneList
-		// = { blendingEntity, plane0, plane1, meshSubtraction };
-		= { plane0, plane1, meshSubtraction };
+		= { blendingEntity, plane0, plane1 };
+		// = { plane0, plane1, meshSubtraction };
 	m_distanceFuncProvider = std::make_shared<IDistanceList>(std::move(sceneList));
 
 #endif

@@ -151,11 +151,11 @@ rgb01 GetColor(float u, float v, float currentTime)
 			// simulate the glsl saturate function : https://developer.download.nvidia.com/cg/saturate.html
 			// diffuse = std::max(0.0f, std::min(1.0f, diffuse));
 
-            float specular = 
-                std::pow(std::max(linalg::dot(reflectLightDir, cameraDirection), 0.0f), 32.0f);
+            // float specular = 
+            //     std::pow(std::max(linalg::dot(reflectLightDir, cameraDirection), 0.0f), 32.0f);
 
             Vector3 color = 
-                std::clamp(diffuse, 0.0f, 1.0f) * info.color + specular;
+                diffuse * info.color;
                 // diffuse * info.color + specular;
 
             // shadow
