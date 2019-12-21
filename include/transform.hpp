@@ -29,4 +29,3 @@ Vector3 ApplyTransform(Transform transform, Vector3 point);
 Vector3 ApplyInverseTransform(Transform transform, Vector3 point);
 
 Vector3 safe_normalize(Vector3 a);
-float safe_distance(Vector3 a, Vector3 b);
