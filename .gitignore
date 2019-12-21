@@ -19,8 +19,9 @@ output/*
 # shared objects and cache for testing
 *.so
 *cache*
-test/bin/*
-test/*.png
+tests/bin/*
+tests/test
+tests/*.png
 
 # python_binding
 python_binding/bin/*
