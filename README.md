@@ -4,7 +4,7 @@
 
 * On Linux, just use the makefile
 
-* On Windows, please use (premake)[https://github.com/premake/premake-core] for generating Visual Studio solution
+* On Windows, please use [premake](https://github.com/premake/premake-core) for generating Visual Studio solution
     * Only `premake vs2017` is used in development
 
 ## Features
