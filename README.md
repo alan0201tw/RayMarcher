@@ -16,7 +16,7 @@
     * Translate, Rotation and Uniform Scaling
 * Mesh Blending and Masking
 * Bounding Volume Hierarchy using Axis-Aligned Bounding Box
-    * This is pretty interesting. Instead of the traditional BVH in a ray-tracer, I used a technique similar to tree pruning, basically I traverse to the bottom of the right subtree and the top node of the left subtree, if the minimum distance found in the right subtree is larger than the top node of the left subtree, the minimum distanced geometry is guaranteed to be in the right subtree.
+    * This is pretty interesting. Instead of the traditional BVH in a ray-tracer, I used a technique similar to tree pruning, basically I traverse to the bottom of the right subtree and the top node of the left subtree, if the minimum distance found in the right subtree is less than the top node of the left subtree, the minimum distanced geometry is guaranteed to be in the right subtree.
 
 ## Demo :
 
