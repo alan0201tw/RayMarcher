@@ -28,7 +28,7 @@ I like computer graphics and rendering a lot. Along my path I started with OpenG
 
 Until this moment I have had experience on the two most famous rendering techniques, and I was hoping some time I would be implementing another simple renderer using ray marching, and this is a great opportunity!
 
-And since I have a working (simple, but working!) ray tracer at hand, I can do some analysis or observation about the image quality, characteristic, perofrmance...etc between the two renderers, and it sounds pretty cool!
+And since I have a working (simple, but working!) ray tracer at hand, I can do some analysis or observation about the image quality, characteristic, performance...etc between the two renderers, and it sounds pretty cool!
 
 
 ## Target / Design Choice
