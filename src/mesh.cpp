@@ -1,6 +1,8 @@
 #include "mesh.hpp"
 
 #include "bvh.hpp"
+#include <stdexcept>
+#include <algorithm>
 
 AABB Triangle::GetBoundingBox() const
 {

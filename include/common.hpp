@@ -8,7 +8,7 @@ struct AABB;
 
 struct DistanceInfo
 {
-    float distance;
+    float distance = 0.0f;
     Vector3 color;
 };
 

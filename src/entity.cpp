@@ -1,6 +1,7 @@
 #include "entity.hpp"
 
 #include "bvh.hpp"
+#include <stdexcept>
 
 AABB Sphere::GetBoundingBox() const
 {
